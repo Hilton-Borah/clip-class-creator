@@ -92,7 +92,7 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
     }, 0);
   }, [selectedVideos, videos]);
 
-  // AI-powered class generation simulation
+  // AI-powered class generation simulation - removed setGeneratedClass reference
   const generateClassWithAI = async () => {
     if (selectedVideos.length === 0) return;
     
@@ -143,7 +143,6 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
       finalVideoUrl: `https://generated-class-${Date.now()}.mp4` // Simulated URL
     };
     
-    setGeneratedClass(newClass);
     setIsGenerating(false);
     
     console.log("AI Generated Class:", newClass);
@@ -328,7 +327,7 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
                   {selectedVideos.length} videos selected ({totalSelectedDuration} min)
                 </div>
                 <Button 
-                  onClick={() => {/* legacy function */}}
+                  onClick={generateClassWithAI}
                   disabled={isGenerating}
                   className="bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700"
                 >

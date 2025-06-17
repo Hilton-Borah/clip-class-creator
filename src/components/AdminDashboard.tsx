@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { ArrowLeft, Plus, Edit, Trash2, Youtube, Clock, Star, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -24,7 +23,8 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
     category: "",
     difficulty: "beginner" as "beginner" | "intermediate" | "advanced",
     duration: "",
-    description: ""
+    description: "",
+    tags: ""
   });
 
   const handleAddVideo = () => {
@@ -36,7 +36,8 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
         difficulty: newVideo.difficulty,
         duration: parseInt(newVideo.duration),
         description: newVideo.description,
-        thumbnailUrl: `https://img.youtube.com/vi/${extractYouTubeId(newVideo.youtubeUrl)}/maxresdefault.jpg`
+        thumbnailUrl: `https://img.youtube.com/vi/${extractYouTubeId(newVideo.youtubeUrl)}/maxresdefault.jpg`,
+        tags: newVideo.tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0)
       });
       
       setNewVideo({
@@ -45,7 +46,8 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
         category: "",
         difficulty: "beginner",
         duration: "",
-        description: ""
+        description: "",
+        tags: ""
       });
       setIsAddingVideo(false);
     }
@@ -161,6 +163,15 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
                       value={newVideo.description}
                       onChange={(e) => setNewVideo({...newVideo, description: e.target.value})}
                       placeholder="Brief description of the video"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="tags">Tags (comma separated)</Label>
+                    <Input
+                      id="tags"
+                      value={newVideo.tags}
+                      onChange={(e) => setNewVideo({...newVideo, tags: e.target.value})}
+                      placeholder="e.g., strength, muscle, workout"
                     />
                   </div>
                   <Button 
