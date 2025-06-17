@@ -1,6 +1,6 @@
 
 import { useState, useMemo } from "react";
-import { ArrowLeft, Search, Filter, Play, Clock, Star, Tag } from "lucide-react";
+import { ArrowLeft, Search, Filter, Play, Clock, Star, Tag, Download, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -12,12 +12,28 @@ interface SearchInterfaceProps {
   onBack: () => void;
 }
 
+interface GeneratedClass {
+  id: string;
+  title: string;
+  totalDuration: number;
+  videoClips: Array<{
+    video: any;
+    startTime: number;
+    endTime: number;
+    voiceoverBefore?: string;
+    voiceoverAfter?: string;
+  }>;
+  finalVideoUrl?: string;
+}
+
 const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
   const { videos } = useVideoStore();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedDifficulty, setSelectedDifficulty] = useState("all");
   const [selectedVideos, setSelectedVideos] = useState<string[]>([]);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedClass, setGeneratedClass] = useState<GeneratedClass | null>(null);
 
   const categories = useMemo(() => {
     const unique = new Set(videos.map(v => v.category));
@@ -59,17 +75,199 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
     }, 0);
   }, [selectedVideos, videos]);
 
-  const generateClass = () => {
+  // AI-powered class generation simulation
+  const generateClassWithAI = async () => {
     if (selectedVideos.length === 0) return;
     
-    const selectedVideoData = videos.filter(v => selectedVideos.includes(v.id));
-    console.log("Generating class with videos:", selectedVideoData);
-    console.log("Total duration:", totalSelectedDuration, "minutes");
+    setIsGenerating(true);
     
-    // This is where you would implement the video merging logic
-    // For now, we'll just show an alert
-    alert(`Class generated! ${selectedVideos.length} videos, ${totalSelectedDuration} minutes total. Video merging and AI voiceover features coming soon!`);
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    const selectedVideoData = videos.filter(v => selectedVideos.includes(v.id));
+    
+    // Generate voiceover transitions (hardcoded for now)
+    const voiceoverTemplates = [
+      "Welcome to your training session! Let's start with our first exercise.",
+      "Great work! Now let's move on to the next movement.",
+      "You're doing amazing! Time for a different challenge.",
+      "Keep up the excellent form! Here's our next exercise.",
+      "Fantastic effort! Let's transition to something new.",
+      "Well done! Ready for the next part of your workout?",
+      "Perfect! Now we're going to focus on a different muscle group.",
+      "Excellent! Time to switch things up with our next exercise.",
+      "Amazing work so far! Let's continue with this next movement.",
+      "That was great! Now we're moving to our final exercise. Give it your all!"
+    ];
+    
+    // Simulate AI video assembly with voiceovers
+    const assembledClips = selectedVideoData.map((video, index) => {
+      const startTime = index === 0 ? 0 : selectedVideoData.slice(0, index).reduce((sum, v) => sum + v.duration, 0);
+      const endTime = startTime + video.duration;
+      
+      return {
+        video,
+        startTime,
+        endTime,
+        voiceoverBefore: index === 0 
+          ? voiceoverTemplates[0] 
+          : voiceoverTemplates[Math.min(index, voiceoverTemplates.length - 1)],
+        voiceoverAfter: index === selectedVideoData.length - 1 
+          ? "Congratulations! You've completed your training session. Great job and keep up the excellent work!"
+          : undefined
+      };
+    });
+    
+    const newClass: GeneratedClass = {
+      id: Date.now().toString(),
+      title: `Custom ${selectedCategory !== 'all' ? selectedCategory : 'Mixed'} Class - ${totalSelectedDuration} min`,
+      totalDuration: totalSelectedDuration,
+      videoClips: assembledClips,
+      finalVideoUrl: `https://generated-class-${Date.now()}.mp4` // Simulated URL
+    };
+    
+    setGeneratedClass(newClass);
+    setIsGenerating(false);
+    
+    console.log("AI Generated Class:", newClass);
   };
+
+  const resetGeneration = () => {
+    setGeneratedClass(null);
+    setSelectedVideos([]);
+  };
+
+  // If class is generated, show the result
+  if (generatedClass) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
+        <header className="bg-white/80 backdrop-blur-sm border-b border-gray-100 sticky top-0 z-10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={resetGeneration}
+                  className="hover:bg-gray-100"
+                >
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  New Class
+                </Button>
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-900">Generated Class</h1>
+                  <p className="text-sm text-gray-600">AI-assembled training video with voiceovers</p>
+                </div>
+              </div>
+              <Button className="bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700">
+                <Download className="w-4 h-4 mr-2" />
+                Download Class
+              </Button>
+            </div>
+          </div>
+        </header>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Class Overview */}
+          <Card className="mb-8 bg-gradient-to-r from-green-50 to-blue-50 border-green-200">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-green-700 text-2xl">{generatedClass.title}</CardTitle>
+                  <p className="text-green-600 mt-2">{generatedClass.videoClips.length} video clips • {generatedClass.totalDuration} minutes total</p>
+                </div>
+                <div className="flex items-center space-x-2 text-green-600">
+                  <Play className="w-5 h-5" />
+                  <span className="font-semibold">Ready to Play</span>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                <div className="flex items-center space-x-2">
+                  <Volume2 className="w-4 h-4 text-green-600" />
+                  <span>AI voiceovers generated</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Play className="w-4 h-4 text-green-600" />
+                  <span>Videos merged with FFmpeg</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Star className="w-4 h-4 text-green-600" />
+                  <span>Smooth transitions added</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Video Timeline */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Class Timeline & Voiceovers</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                {generatedClass.videoClips.map((clip, index) => (
+                  <div key={index} className="border rounded-lg p-4 bg-gray-50">
+                    {/* Voiceover Before */}
+                    {clip.voiceoverBefore && (
+                      <div className="mb-4 p-3 bg-blue-100 rounded-lg border-l-4 border-blue-500">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <Volume2 className="w-4 h-4 text-blue-600" />
+                          <span className="text-sm font-semibold text-blue-800">AI Voiceover</span>
+                          <Badge variant="secondary" className="text-xs">
+                            {String(clip.startTime).padStart(2, '0')}:00
+                          </Badge>
+                        </div>
+                        <p className="text-blue-700 italic">"{clip.voiceoverBefore}"</p>
+                      </div>
+                    )}
+                    
+                    {/* Video Clip */}
+                    <div className="flex items-center space-x-4">
+                      <div className="w-20 h-12 bg-gray-200 rounded flex items-center justify-center">
+                        <Play className="w-4 h-4 text-gray-500" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-gray-900">{clip.video.title}</h4>
+                        <div className="flex items-center space-x-4 text-sm text-gray-600 mt-1">
+                          <span className="flex items-center space-x-1">
+                            <Clock className="w-3 h-3" />
+                            <span>{clip.video.duration}min</span>
+                          </span>
+                          <Badge variant="secondary">{clip.video.category}</Badge>
+                          <Badge className={getDifficultyColor(clip.video.difficulty)}>
+                            {clip.video.difficulty}
+                          </Badge>
+                        </div>
+                      </div>
+                      <div className="text-right text-sm text-gray-500">
+                        <div>{String(clip.startTime).padStart(2, '0')}:00 - {String(clip.endTime).padStart(2, '0')}:00</div>
+                      </div>
+                    </div>
+
+                    {/* Voiceover After */}
+                    {clip.voiceoverAfter && (
+                      <div className="mt-4 p-3 bg-green-100 rounded-lg border-l-4 border-green-500">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <Volume2 className="w-4 h-4 text-green-600" />
+                          <span className="text-sm font-semibold text-green-800">AI Closing</span>
+                          <Badge variant="secondary" className="text-xs">
+                            {String(clip.endTime).padStart(2, '0')}:00
+                          </Badge>
+                        </div>
+                        <p className="text-green-700 italic">"{clip.voiceoverAfter}"</p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
@@ -98,11 +296,21 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
                   {selectedVideos.length} videos selected ({totalSelectedDuration} min)
                 </div>
                 <Button 
-                  onClick={generateClass}
+                  onClick={generateClassWithAI}
+                  disabled={isGenerating}
                   className="bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700"
                 >
-                  <Play className="w-4 h-4 mr-2" />
-                  Generate Class
+                  {isGenerating ? (
+                    <>
+                      <div className="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <Play className="w-4 h-4 mr-2" />
+                      Generate AI Class
+                    </>
+                  )}
                 </Button>
               </div>
             )}
@@ -245,21 +453,21 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
           </CardContent>
         </Card>
 
-        {/* Future Features Preview */}
+        {/* AI Generation Preview */}
         {selectedVideos.length > 0 && (
           <Card className="mt-8 bg-gradient-to-r from-purple-50 to-blue-50 border-purple-200">
             <CardHeader>
-              <CardTitle className="text-purple-700">Class Generation Preview</CardTitle>
+              <CardTitle className="text-purple-700">AI Class Generation Preview</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                 <div className="flex items-center space-x-2">
-                  <Play className="w-4 h-4 text-purple-600" />
-                  <span>Videos will be merged with FFmpeg</span>
+                  <Volume2 className="w-4 h-4 text-purple-600" />
+                  <span>AI voiceovers between segments</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Clock className="w-4 h-4 text-purple-600" />
-                  <span>AI voiceovers between segments</span>
+                  <Play className="w-4 h-4 text-purple-600" />
+                  <span>Videos merged with FFmpeg</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Star className="w-4 h-4 text-purple-600" />
