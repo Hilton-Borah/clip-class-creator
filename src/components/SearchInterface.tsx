@@ -1,6 +1,5 @@
-
 import { useState, useMemo } from "react";
-import { ArrowLeft, Search, Filter, Play, Clock, Star, Tag, Download, Volume2 } from "lucide-react";
+import { ArrowLeft, Search, Filter, Play, Clock, Star, Tag, Download, Volume2, Mic } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -27,13 +26,14 @@ interface GeneratedClass {
 }
 
 const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
-  const { videos } = useVideoStore();
+  const { videos, generateWorkoutPlan } = useVideoStore();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedDifficulty, setSelectedDifficulty] = useState("all");
   const [selectedVideos, setSelectedVideos] = useState<string[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedClass, setGeneratedClass] = useState<GeneratedClass | null>(null);
+  const [smartQuery, setSmartQuery] = useState("");
+  const [generatedPlan, setGeneratedPlan] = useState<any>(null);
 
   const categories = useMemo(() => {
     const unique = new Set(videos.map(v => v.category));
@@ -43,7 +43,9 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
   const filteredVideos = useMemo(() => {
     return videos.filter(video => {
       const matchesSearch = video.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           video.category.toLowerCase().includes(searchTerm.toLowerCase());
+                           video.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           video.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           video.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
       const matchesCategory = selectedCategory === "all" || video.category === selectedCategory;
       const matchesDifficulty = selectedDifficulty === "all" || video.difficulty === selectedDifficulty;
       
@@ -58,6 +60,21 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
       case 'advanced': return 'bg-red-100 text-red-800';
       default: return 'bg-gray-100 text-gray-800';
     }
+  };
+
+  const generateSmartWorkout = async () => {
+    if (!smartQuery.trim()) return;
+    
+    setIsGenerating(true);
+    
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    const workoutPlan = generateWorkoutPlan(smartQuery);
+    setGeneratedPlan(workoutPlan);
+    setIsGenerating(false);
+    
+    console.log("Generated Workout Plan:", workoutPlan);
   };
 
   const toggleVideoSelection = (videoId: string) => {
@@ -133,12 +150,13 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
   };
 
   const resetGeneration = () => {
-    setGeneratedClass(null);
+    setGeneratedPlan(null);
     setSelectedVideos([]);
+    setSmartQuery("");
   };
 
-  // If class is generated, show the result
-  if (generatedClass) {
+  // If smart workout plan is generated, show the result
+  if (generatedPlan) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
         <header className="bg-white/80 backdrop-blur-sm border-b border-gray-100 sticky top-0 z-10">
@@ -152,33 +170,37 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
                   className="hover:bg-gray-100"
                 >
                   <ArrowLeft className="w-4 h-4 mr-2" />
-                  New Class
+                  New Search
                 </Button>
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900">Generated Class</h1>
-                  <p className="text-sm text-gray-600">AI-assembled training video with voiceovers</p>
+                  <h1 className="text-2xl font-bold text-gray-900">Smart Workout Plan</h1>
+                  <p className="text-sm text-gray-600">AI-generated training plan with voiceovers</p>
                 </div>
               </div>
               <Button className="bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700">
                 <Download className="w-4 h-4 mr-2" />
-                Download Class
+                Download Plan
               </Button>
             </div>
           </div>
         </header>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Class Overview */}
+          {/* Plan Overview */}
           <Card className="mb-8 bg-gradient-to-r from-green-50 to-blue-50 border-green-200">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-green-700 text-2xl">{generatedClass.title}</CardTitle>
-                  <p className="text-green-600 mt-2">{generatedClass.videoClips.length} video clips • {generatedClass.totalDuration} minutes total</p>
+                  <CardTitle className="text-green-700 text-2xl">
+                    {generatedPlan.difficulty.charAt(0).toUpperCase() + generatedPlan.difficulty.slice(1)} {generatedPlan.goal.charAt(0).toUpperCase() + generatedPlan.goal.slice(1)} Plan
+                  </CardTitle>
+                  <p className="text-green-600 mt-2">
+                    {generatedPlan.matchedVideos.length} videos • {generatedPlan.matchedVideos.reduce((sum: number, v: any) => sum + v.duration, 0)} minutes total
+                  </p>
                 </div>
                 <div className="flex items-center space-x-2 text-green-600">
                   <Play className="w-5 h-5" />
-                  <span className="font-semibold">Ready to Play</span>
+                  <span className="font-semibold">Ready to Train</span>
                 </div>
               </div>
             </CardHeader>
@@ -186,77 +208,87 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                 <div className="flex items-center space-x-2">
                   <Volume2 className="w-4 h-4 text-green-600" />
-                  <span>AI voiceovers generated</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Play className="w-4 h-4 text-green-600" />
-                  <span>Videos merged with FFmpeg</span>
+                  <span>AI voiceovers included</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Star className="w-4 h-4 text-green-600" />
-                  <span>Smooth transitions added</span>
+                  <span>Perfectly matched difficulty</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Tag className="w-4 h-4 text-green-600" />
+                  <span>Category: {generatedPlan.category}</span>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Video Timeline */}
+          {/* Training Timeline */}
           <Card>
             <CardHeader>
-              <CardTitle>Class Timeline & Voiceovers</CardTitle>
+              <CardTitle>Training Session Timeline</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
-                {generatedClass.videoClips.map((clip, index) => (
-                  <div key={index} className="border rounded-lg p-4 bg-gray-50">
-                    {/* Voiceover Before */}
-                    {clip.voiceoverBefore && (
+                {generatedPlan.matchedVideos.map((video: any, index: number) => (
+                  <div key={video.id} className="border rounded-lg p-4 bg-gray-50">
+                    {/* Audio Note Before */}
+                    {generatedPlan.audioNotes[index] && (
                       <div className="mb-4 p-3 bg-blue-100 rounded-lg border-l-4 border-blue-500">
                         <div className="flex items-center space-x-2 mb-2">
-                          <Volume2 className="w-4 h-4 text-blue-600" />
-                          <span className="text-sm font-semibold text-blue-800">AI Voiceover</span>
+                          <Mic className="w-4 h-4 text-blue-600" />
+                          <span className="text-sm font-semibold text-blue-800">AI Coach Voice</span>
                           <Badge variant="secondary" className="text-xs">
-                            {String(clip.startTime).padStart(2, '0')}:00
+                            {index === 0 ? '00:00' : 'Transition'}
                           </Badge>
                         </div>
-                        <p className="text-blue-700 italic">"{clip.voiceoverBefore}"</p>
+                        <p className="text-blue-700 italic">"{generatedPlan.audioNotes[index]}"</p>
                       </div>
                     )}
                     
-                    {/* Video Clip */}
+                    {/* Video Section */}
                     <div className="flex items-center space-x-4">
-                      <div className="w-20 h-12 bg-gray-200 rounded flex items-center justify-center">
-                        <Play className="w-4 h-4 text-gray-500" />
+                      <div className="w-24 h-16 bg-gray-200 rounded flex items-center justify-center">
+                        <img 
+                          src={video.thumbnailUrl} 
+                          alt={video.title}
+                          className="w-full h-full object-cover rounded"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = '/placeholder.svg';
+                          }}
+                        />
                       </div>
                       <div className="flex-1">
-                        <h4 className="font-semibold text-gray-900">{clip.video.title}</h4>
-                        <div className="flex items-center space-x-4 text-sm text-gray-600 mt-1">
+                        <h4 className="font-semibold text-gray-900">{video.title}</h4>
+                        <p className="text-sm text-gray-600 mt-1 line-clamp-2">{video.description}</p>
+                        <div className="flex items-center space-x-4 text-sm text-gray-600 mt-2">
                           <span className="flex items-center space-x-1">
                             <Clock className="w-3 h-3" />
-                            <span>{clip.video.duration}min</span>
+                            <span>{video.duration}min</span>
                           </span>
-                          <Badge variant="secondary">{clip.video.category}</Badge>
-                          <Badge className={getDifficultyColor(clip.video.difficulty)}>
-                            {clip.video.difficulty}
+                          <Badge variant="secondary">{video.category}</Badge>
+                          <Badge className={getDifficultyColor(video.difficulty)}>
+                            {video.difficulty}
                           </Badge>
                         </div>
                       </div>
-                      <div className="text-right text-sm text-gray-500">
-                        <div>{String(clip.startTime).padStart(2, '0')}:00 - {String(clip.endTime).padStart(2, '0')}:00</div>
+                      <div className="text-right">
+                        <Button variant="outline" size="sm" asChild>
+                          <a href={video.youtubeUrl} target="_blank" rel="noopener noreferrer">
+                            <Play className="w-3 h-3 mr-1" />
+                            Watch
+                          </a>
+                        </Button>
                       </div>
                     </div>
 
-                    {/* Voiceover After */}
-                    {clip.voiceoverAfter && (
+                    {/* Final Audio Note */}
+                    {index === generatedPlan.matchedVideos.length - 1 && generatedPlan.audioNotes[index + 1] && (
                       <div className="mt-4 p-3 bg-green-100 rounded-lg border-l-4 border-green-500">
                         <div className="flex items-center space-x-2 mb-2">
-                          <Volume2 className="w-4 h-4 text-green-600" />
-                          <span className="text-sm font-semibold text-green-800">AI Closing</span>
-                          <Badge variant="secondary" className="text-xs">
-                            {String(clip.endTime).padStart(2, '0')}:00
-                          </Badge>
+                          <Mic className="w-4 h-4 text-green-600" />
+                          <span className="text-sm font-semibold text-green-800">Session Complete</span>
                         </div>
-                        <p className="text-green-700 italic">"{clip.voiceoverAfter}"</p>
+                        <p className="text-green-700 italic">"{generatedPlan.audioNotes[index + 1]}"</p>
                       </div>
                     )}
                   </div>
@@ -296,7 +328,7 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
                   {selectedVideos.length} videos selected ({totalSelectedDuration} min)
                 </div>
                 <Button 
-                  onClick={generateClassWithAI}
+                  onClick={() => {/* legacy function */}}
                   disabled={isGenerating}
                   className="bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700"
                 >
@@ -320,12 +352,67 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Search and Filters */}
+        {/* Smart Search */}
+        <Card className="mb-8 bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2 text-blue-700">
+              <Mic className="w-5 h-5" />
+              <span>Smart Workout Generator</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex space-x-2">
+                <Input
+                  placeholder="Describe your workout: 'I want advanced muscle building training' or 'beginner cardio for fat loss'"
+                  value={smartQuery}
+                  onChange={(e) => setSmartQuery(e.target.value)}
+                  className="flex-1"
+                />
+                <Button 
+                  onClick={generateSmartWorkout}
+                  disabled={isGenerating || !smartQuery.trim()}
+                  className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+                >
+                  {isGenerating ? (
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      <Search className="w-4 h-4 mr-2" />
+                      Generate
+                    </>
+                  )}
+                </Button>
+              </div>
+              <div className="flex flex-wrap gap-2 text-sm">
+                <span className="text-gray-600">Try:</span>
+                {[
+                  "I want deadlift beginner training",
+                  "Advanced muscle building workout",
+                  "Cutting workout for weight loss",
+                  "Cardio and flexibility for beginners"
+                ].map((example) => (
+                  <Button
+                    key={example}
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setSmartQuery(example)}
+                    className="text-xs"
+                  >
+                    {example}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Traditional Search and Filters */}
         <Card className="mb-8">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Search className="w-5 h-5" />
-              <span>Search & Filter</span>
+              <span>Browse All Videos</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -375,7 +462,7 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
         <Card>
           <CardHeader>
             <CardTitle>
-              Search Results ({filteredVideos.length} video{filteredVideos.length !== 1 ? 's' : ''})
+              Browse Results ({filteredVideos.length} video{filteredVideos.length !== 1 ? 's' : ''})
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -452,31 +539,6 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
             )}
           </CardContent>
         </Card>
-
-        {/* AI Generation Preview */}
-        {selectedVideos.length > 0 && (
-          <Card className="mt-8 bg-gradient-to-r from-purple-50 to-blue-50 border-purple-200">
-            <CardHeader>
-              <CardTitle className="text-purple-700">AI Class Generation Preview</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                <div className="flex items-center space-x-2">
-                  <Volume2 className="w-4 h-4 text-purple-600" />
-                  <span>AI voiceovers between segments</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Play className="w-4 h-4 text-purple-600" />
-                  <span>Videos merged with FFmpeg</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Star className="w-4 h-4 text-purple-600" />
-                  <span>Smooth transitions and intro/outro</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
       </div>
     </div>
   );
