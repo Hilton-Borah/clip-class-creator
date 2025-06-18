@@ -107,7 +107,7 @@ const videoLibrary: Video[] = [
   {
     id: '7',
     title: 'Cutting Phase Workout Plan for Fat Loss and Muscle Retention',
-    youtubeUrl: 'https://www.youtube.com/watch?v=4BOTvaRaDjI',
+    youtubeUrl: 'https://youtube.com/shorts/ij39-o7lE2U?si=40Pvnhe8A4VNjEpq',
     thumbnailUrl: 'https://img.youtube.com/vi/cutting-workout/maxresdefault.jpg',
     category: 'cutting',
     difficulty: 'intermediate',
@@ -119,7 +119,7 @@ const videoLibrary: Video[] = [
   {
     id: '8',
     title: 'Beginner Flexibility and Mobility Routine for Better Movement',
-    youtubeUrl: 'https://www.youtube.com/watch?v=4pKly2JojMw',
+    youtubeUrl: 'https://youtube.com/shorts/w_NOyxLP9i4?si=r4g6hoaKN1z4IOCA',
     thumbnailUrl: 'https://img.youtube.com/vi/flexibility-basics/maxresdefault.jpg',
     category: 'flexibility',
     difficulty: 'beginner',
@@ -131,7 +131,7 @@ const videoLibrary: Video[] = [
   {
     id: '9',
     title: 'Advanced Flexibility Training for Athletes and Performers',
-    youtubeUrl: 'https://www.youtube.com/watch?v=oBu-pQG6sTY',
+    youtubeUrl: 'https://youtu.be/FdyhENXyIQ4?si=EboHKU7sOd26N5Qe',
     thumbnailUrl: 'https://img.youtube.com/vi/advanced-flexibility/maxresdefault.jpg',
     category: 'flexibility',
     difficulty: 'advanced',
@@ -155,7 +155,7 @@ const videoLibrary: Video[] = [
   {
     id: '11',
     title: 'Beginner Fat Loss Workout with Nutrition Tips',
-    youtubeUrl: 'https://www.youtube.com/watch?v=QfWYJ0lX5J8',
+    youtubeUrl: 'https://youtu.be/Ues9N2uDa8Y?si=yAxSNbnrhwyNzt8X',
     thumbnailUrl: 'https://img.youtube.com/vi/beginner-fat-loss/maxresdefault.jpg',
     category: 'fat loss',
     difficulty: 'beginner',
