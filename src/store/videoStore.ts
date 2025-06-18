@@ -35,7 +35,7 @@ const videoLibrary: Video[] = [
   {
     id: '1',
     title: 'Complete Deadlift Form and Technique for Beginners',
-    youtubeUrl: 'https://www.youtube.com/watch?v=op9kVnSso6Q',
+    youtubeUrl: 'https://youtu.be/Vu_NnDWxKY4?si=yo8Z6z9IWYJc1Hh1',
     thumbnailUrl: 'https://img.youtube.com/vi/deadlift101/maxresdefault.jpg',
     category: 'deadlift',
     difficulty: 'beginner',
@@ -47,7 +47,7 @@ const videoLibrary: Video[] = [
   {
     id: '2',
     title: 'Advanced Deadlift Variations for Maximum Muscle Building',
-    youtubeUrl: 'https://www.youtube.com/watch?v=O1lZ9GZvQh8',
+    youtubeUrl: 'https://youtu.be/lMWOrDH694c?si=9dNcODTGmiG3hjK4',
     thumbnailUrl: 'https://img.youtube.com/vi/deadlift-advanced/maxresdefault.jpg',
     category: 'muscle building',
     difficulty: 'advanced',
@@ -59,7 +59,7 @@ const videoLibrary: Video[] = [
   {
     id: '3',
     title: 'High Intensity Cardio HIIT Workout for Fat Loss',
-    youtubeUrl: 'https://www.youtube.com/watch?v=ml6cT4AZdqI',
+    youtubeUrl: 'https://youtu.be/Fnt7AJDLHkw?si=8n7rBOkCsQ6fJFZZ',
     thumbnailUrl: 'https://img.youtube.com/vi/hiit-cardio/maxresdefault.jpg',
     category: 'HIIT',
     difficulty: 'intermediate',
@@ -71,7 +71,7 @@ const videoLibrary: Video[] = [
   {
     id: '4',
     title: 'Beginner Friendly Cardio Dance Workout for Weight Loss',
-    youtubeUrl: 'https://www.youtube.com/watch?v=ZWdB8Y9tK-I',
+    youtubeUrl: 'https://youtube.com/shorts/bBcnOS1ei88?si=ucnATwQoff_Ka_vY',
     thumbnailUrl: 'https://img.youtube.com/vi/cardio-dance/maxresdefault.jpg',
     category: 'cardio',
     difficulty: 'beginner',
@@ -83,7 +83,7 @@ const videoLibrary: Video[] = [
   {
     id: '5',
     title: 'Full Body Weight Lifting Routine for Muscle Building',
-    youtubeUrl: 'https://www.youtube.com/watch?v=UItWltVZZmE',
+    youtubeUrl: 'https://youtube.com/shorts/FyJqqHA-NiE?si=tykgWFQXyumei4bv',
     thumbnailUrl: 'https://img.youtube.com/vi/fullbody-weights/maxresdefault.jpg',
     category: 'weight lifting',
     difficulty: 'intermediate',
