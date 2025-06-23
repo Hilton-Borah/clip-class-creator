@@ -272,21 +272,14 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
                 {videos.map((video) => (
                   <div key={video.id} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
                     <div className="aspect-video bg-gray-100 relative">
-                      {extractYouTubeId(video.youtubeUrl) ? (
-                        <iframe
-                          src={`${video.youtubeUrl}`}
+                      <iframe
+                          src={video.youtubeUrl}
                           title={video.title}
                           className="w-full h-full"
                           frameBorder="0"
                           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                           allowFullScreen
                         />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-gray-500">
-                          <Youtube className="w-8 h-8 mb-2" />
-                          <p>Invalid YouTube URL</p>
-                        </div>
-                      )}
                       <div className="absolute bottom-2 right-2 bg-black/75 text-white px-2 py-1 rounded text-xs">
                         {video.duration}min
                       </div>
