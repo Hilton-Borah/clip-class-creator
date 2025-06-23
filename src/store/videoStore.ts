@@ -35,7 +35,7 @@ const videoLibrary: Video[] = [
   {
     id: '1',
     title: 'Complete Deadlift Form and Technique for Beginners',
-    youtubeUrl: 'https://youtu.be/Vu_NnDWxKY4?si=yo8Z6z9IWYJc1Hh1',
+    youtubeUrl: 'https://youtu.be/enYITYwvPAQ?si=bbPb0CwSg08GKMSJ',
     thumbnailUrl: 'https://img.youtube.com/vi/deadlift101/maxresdefault.jpg',
     category: 'deadlift',
     difficulty: 'beginner',
@@ -47,7 +47,7 @@ const videoLibrary: Video[] = [
   {
     id: '2',
     title: 'Advanced Deadlift Variations for Maximum Muscle Building',
-    youtubeUrl: 'https://youtu.be/lMWOrDH694c?si=9dNcODTGmiG3hjK4',
+    youtubeUrl: 'https://youtu.be/wIynl3at0Rs?si=-H8jJP0ZCCYsJVCC',
     thumbnailUrl: 'https://img.youtube.com/vi/deadlift-advanced/maxresdefault.jpg',
     category: 'muscle building',
     difficulty: 'advanced',
@@ -59,7 +59,7 @@ const videoLibrary: Video[] = [
   {
     id: '3',
     title: 'High Intensity Cardio HIIT Workout for Fat Loss',
-    youtubeUrl: 'https://youtu.be/Fnt7AJDLHkw?si=8n7rBOkCsQ6fJFZZ',
+    youtubeUrl: 'https://youtu.be/UIPvIYsjfpo?si=q1yFHs1hPrFZXyqx',
     thumbnailUrl: 'https://img.youtube.com/vi/hiit-cardio/maxresdefault.jpg',
     category: 'HIIT',
     difficulty: 'intermediate',
@@ -71,7 +71,7 @@ const videoLibrary: Video[] = [
   {
     id: '4',
     title: 'Beginner Friendly Cardio Dance Workout for Weight Loss',
-    youtubeUrl: 'https://youtube.com/shorts/bBcnOS1ei88?si=ucnATwQoff_Ka_vY',
+    youtubeUrl: 'https://youtu.be/-hSma-BRzoo?si=iDNN4RPui0pqDc0-',
     thumbnailUrl: 'https://img.youtube.com/vi/cardio-dance/maxresdefault.jpg',
     category: 'cardio',
     difficulty: 'beginner',
@@ -83,7 +83,7 @@ const videoLibrary: Video[] = [
   {
     id: '5',
     title: 'Full Body Weight Lifting Routine for Muscle Building',
-    youtubeUrl: 'https://youtube.com/shorts/FyJqqHA-NiE?si=tykgWFQXyumei4bv',
+    youtubeUrl: 'https://youtu.be/qml_YVfm0z0?si=fljqicS0bdps-KV6',
     thumbnailUrl: 'https://img.youtube.com/vi/fullbody-weights/maxresdefault.jpg',
     category: 'weight lifting',
     difficulty: 'intermediate',
@@ -95,7 +95,7 @@ const videoLibrary: Video[] = [
   {
     id: '6',
     title: 'Advanced Weight Lifting Techniques for Serious Muscle Growth',
-    youtubeUrl: 'https://www.youtube.com/watch?v=GFqh6JS_znk',
+    youtubeUrl: 'https://youtu.be/aEUQZK8NF1Q?si=6BM2Z74tmW7Lb2tJ',
     thumbnailUrl: 'https://img.youtube.com/vi/advanced-lifting/maxresdefault.jpg',
     category: 'muscle building',
     difficulty: 'advanced',
@@ -107,7 +107,7 @@ const videoLibrary: Video[] = [
   {
     id: '7',
     title: 'Cutting Phase Workout Plan for Fat Loss and Muscle Retention',
-    youtubeUrl: 'https://youtube.com/shorts/ij39-o7lE2U?si=40Pvnhe8A4VNjEpq',
+    youtubeUrl: 'https://youtu.be/AdqrTg_hpEQ?si=pam0OKalWqyVbwuv',
     thumbnailUrl: 'https://img.youtube.com/vi/cutting-workout/maxresdefault.jpg',
     category: 'cutting',
     difficulty: 'intermediate',
@@ -119,7 +119,7 @@ const videoLibrary: Video[] = [
   {
     id: '8',
     title: 'Beginner Flexibility and Mobility Routine for Better Movement',
-    youtubeUrl: 'https://youtube.com/shorts/w_NOyxLP9i4?si=r4g6hoaKN1z4IOCA',
+    youtubeUrl: 'https://youtu.be/RP0Q8geTcJc?si=EFuOaw-BEb0Mdcu1',
     thumbnailUrl: 'https://img.youtube.com/vi/flexibility-basics/maxresdefault.jpg',
     category: 'flexibility',
     difficulty: 'beginner',
@@ -131,7 +131,7 @@ const videoLibrary: Video[] = [
   {
     id: '9',
     title: 'Advanced Flexibility Training for Athletes and Performers',
-    youtubeUrl: 'https://youtu.be/FdyhENXyIQ4?si=EboHKU7sOd26N5Qe',
+    youtubeUrl: 'https://youtu.be/duVMTFaddGs?si=Rq1arWNizVS2wTSt',
     thumbnailUrl: 'https://img.youtube.com/vi/advanced-flexibility/maxresdefault.jpg',
     category: 'flexibility',
     difficulty: 'advanced',
@@ -143,7 +143,7 @@ const videoLibrary: Video[] = [
   {
     id: '10',
     title: 'Intense Fat Loss Circuit Training for Quick Results',
-    youtubeUrl: 'https://www.youtube.com/watch?v=M0uO8X3_tEA',
+    youtubeUrl: 'https://youtu.be/_NhuJDuHNZY?si=Lm_HmWZXDNCQUiB1',
     thumbnailUrl: 'https://img.youtube.com/vi/fat-loss-circuit/maxresdefault.jpg',
     category: 'fat loss',
     difficulty: 'intermediate',
