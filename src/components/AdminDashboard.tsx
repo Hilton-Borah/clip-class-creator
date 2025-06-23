@@ -274,7 +274,7 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
                     <div className="aspect-video bg-gray-100 relative">
                       {extractYouTubeId(video.youtubeUrl) ? (
                         <iframe
-                          src={`https://www.youtube.com/embed/${extractYouTubeId(video.youtubeUrl)}`}
+                          src={`${video.youtubeUrl}`}
                           title={video.title}
                           className="w-full h-full"
                           frameBorder="0"
