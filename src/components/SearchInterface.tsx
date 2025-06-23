@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from "react";
 import { ArrowLeft, Search, Play, Clock, Star, Tag, Download, Volume2, Mic, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -34,14 +33,6 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
       }
     }
     return null;
-  };
-
-  const getYouTubeThumbnail = (youtubeUrl: string) => {
-    const videoId = extractYouTubeId(youtubeUrl);
-    if (videoId) {
-      return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
-    }
-    return '/placeholder.svg';
   };
 
   const speakText = (text: string) => {
@@ -224,14 +215,18 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
                     <div className="space-y-4">
                       <div className="flex items-center space-x-4">
                         <div className="w-24 h-16 bg-gray-200 rounded flex items-center justify-center">
-                          <img 
-                            src={getYouTubeThumbnail(video.youtubeUrl)} 
-                            alt={video.title}
-                            className="w-full h-full object-cover rounded"
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).src = '/placeholder.svg';
-                            }}
-                          />
+                          {extractYouTubeId(video.youtubeUrl) ? (
+                            <iframe
+                              src={`https://www.youtube.com/embed/${extractYouTubeId(video.youtubeUrl)}`}
+                              title={video.title}
+                              className="w-full h-full rounded"
+                              frameBorder="0"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                            />
+                          ) : (
+                            <Play className="w-6 h-6 text-gray-400" />
+                          )}
                         </div>
                         <div className="flex-1">
                           <h4 className="font-semibold text-gray-900">{video.title}</h4>

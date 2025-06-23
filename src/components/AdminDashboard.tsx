@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { ArrowLeft, Plus, Edit, Trash2, Youtube, Clock, Star, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -45,14 +44,6 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
     return null;
   };
 
-  const getYouTubeThumbnail = (youtubeUrl: string) => {
-    const videoId = extractYouTubeId(youtubeUrl);
-    if (videoId) {
-      return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
-    }
-    return '/placeholder.svg';
-  };
-
   const handleAddVideo = () => {
     if (newVideo.title && newVideo.youtubeUrl && newVideo.category && newVideo.duration) {
       addVideo({
@@ -62,7 +53,7 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
         difficulty: newVideo.difficulty,
         duration: parseInt(newVideo.duration),
         description: newVideo.description,
-        thumbnailUrl: getYouTubeThumbnail(newVideo.youtubeUrl),
+        thumbnailUrl: "", // Not needed since we're using direct YouTube URLs
         tags: newVideo.tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0)
       });
       
@@ -136,7 +127,7 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
                       id="youtubeUrl"
                       value={newVideo.youtubeUrl}
                       onChange={(e) => setNewVideo({...newVideo, youtubeUrl: e.target.value})}
-                      placeholder="https://youtube.com/watch?v=..."
+                      placeholder="https://youtube.com/watch?v=... or embedded URL"
                     />
                   </div>
                   <div>
@@ -281,14 +272,21 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
                 {videos.map((video) => (
                   <div key={video.id} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
                     <div className="aspect-video bg-gray-100 relative">
-                      <img 
-                        src={getYouTubeThumbnail(video.youtubeUrl)} 
-                        alt={video.title}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = '/placeholder.svg';
-                        }}
-                      />
+                      {extractYouTubeId(video.youtubeUrl) ? (
+                        <iframe
+                          src={`https://www.youtube.com/embed/${extractYouTubeId(video.youtubeUrl)}`}
+                          title={video.title}
+                          className="w-full h-full"
+                          frameBorder="0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-gray-500">
+                          <Youtube className="w-8 h-8 mb-2" />
+                          <p>Invalid YouTube URL</p>
+                        </div>
+                      )}
                       <div className="absolute bottom-2 right-2 bg-black/75 text-white px-2 py-1 rounded text-xs">
                         {video.duration}min
                       </div>
