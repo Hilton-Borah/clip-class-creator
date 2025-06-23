@@ -19,6 +19,31 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [currentAudio, setCurrentAudio] = useState<SpeechSynthesisUtterance | null>(null);
 
+  const extractYouTubeId = (url: string) => {
+    if (!url) return null;
+    
+    const patterns = [
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
+      /youtube\.com\/watch\?.*v=([^&\n?#]+)/
+    ];
+    
+    for (const pattern of patterns) {
+      const match = url.match(pattern);
+      if (match && match[1]) {
+        return match[1];
+      }
+    }
+    return null;
+  };
+
+  const getYouTubeThumbnail = (youtubeUrl: string) => {
+    const videoId = extractYouTubeId(youtubeUrl);
+    if (videoId) {
+      return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+    }
+    return '/placeholder.svg';
+  };
+
   const speakText = (text: string) => {
     // Stop any currently playing speech
     if (currentAudio) {
@@ -78,12 +103,6 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
     setGeneratedPlan(null);
     setSmartQuery("");
     stopSpeaking();
-  };
-
-  const extractYouTubeId = (url: string) => {
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-    const match = url.match(regExp);
-    return (match && match[2].length === 11) ? match[2] : null;
   };
 
   // If smart workout plan is generated, show the result
@@ -206,7 +225,7 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
                       <div className="flex items-center space-x-4">
                         <div className="w-24 h-16 bg-gray-200 rounded flex items-center justify-center">
                           <img 
-                            src={video.thumbnailUrl} 
+                            src={getYouTubeThumbnail(video.youtubeUrl)} 
                             alt={video.title}
                             className="w-full h-full object-cover rounded"
                             onError={(e) => {

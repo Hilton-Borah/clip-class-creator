@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { ArrowLeft, Plus, Edit, Trash2, Youtube, Clock, Star, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -27,6 +28,31 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
     tags: ""
   });
 
+  const extractYouTubeId = (url: string) => {
+    if (!url) return null;
+    
+    const patterns = [
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
+      /youtube\.com\/watch\?.*v=([^&\n?#]+)/
+    ];
+    
+    for (const pattern of patterns) {
+      const match = url.match(pattern);
+      if (match && match[1]) {
+        return match[1];
+      }
+    }
+    return null;
+  };
+
+  const getYouTubeThumbnail = (youtubeUrl: string) => {
+    const videoId = extractYouTubeId(youtubeUrl);
+    if (videoId) {
+      return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+    }
+    return '/placeholder.svg';
+  };
+
   const handleAddVideo = () => {
     if (newVideo.title && newVideo.youtubeUrl && newVideo.category && newVideo.duration) {
       addVideo({
@@ -36,7 +62,7 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
         difficulty: newVideo.difficulty,
         duration: parseInt(newVideo.duration),
         description: newVideo.description,
-        thumbnailUrl: `https://img.youtube.com/vi/${extractYouTubeId(newVideo.youtubeUrl)}/maxresdefault.jpg`,
+        thumbnailUrl: getYouTubeThumbnail(newVideo.youtubeUrl),
         tags: newVideo.tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0)
       });
       
@@ -51,12 +77,6 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
       });
       setIsAddingVideo(false);
     }
-  };
-
-  const extractYouTubeId = (url: string) => {
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-    const match = url.match(regExp);
-    return (match && match[2].length === 11) ? match[2] : 'dQw4w9WgXcQ';
   };
 
   const getDifficultyColor = (difficulty: string) => {
@@ -262,7 +282,7 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
                   <div key={video.id} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
                     <div className="aspect-video bg-gray-100 relative">
                       <img 
-                        src={video.thumbnailUrl} 
+                        src={getYouTubeThumbnail(video.youtubeUrl)} 
                         alt={video.title}
                         className="w-full h-full object-cover"
                         onError={(e) => {
