@@ -35,7 +35,7 @@ const videoLibrary: Video[] = [
   {
     id: '1',
     title: 'Complete Deadlift Form and Technique for Beginners',
-    youtubeUrl: 'https://youtu.be/enYITYwvPAQ?si=bbPb0CwSg08GKMSJ',
+    youtubeUrl: 'https://www.youtube.com/embed/UIPvIYsjfpo?si=OaGdqtpZmgO2kxnU',
     thumbnailUrl: 'https://img.youtube.com/vi/deadlift101/maxresdefault.jpg',
     category: 'deadlift',
     difficulty: 'beginner',
@@ -47,7 +47,7 @@ const videoLibrary: Video[] = [
   {
     id: '2',
     title: 'Advanced Deadlift Variations for Maximum Muscle Building',
-    youtubeUrl: 'https://youtu.be/wIynl3at0Rs?si=-H8jJP0ZCCYsJVCC',
+    youtubeUrl: 'https://www.youtube.com/embed/3lmGfN-8C6I?si=4H-bzTDumJwdzy7i',
     thumbnailUrl: 'https://img.youtube.com/vi/deadlift-advanced/maxresdefault.jpg',
     category: 'muscle building',
     difficulty: 'advanced',
@@ -59,7 +59,7 @@ const videoLibrary: Video[] = [
   {
     id: '3',
     title: 'High Intensity Cardio HIIT Workout for Fat Loss',
-    youtubeUrl: 'https://youtu.be/UIPvIYsjfpo?si=q1yFHs1hPrFZXyqx',
+    youtubeUrl: 'https://www.youtube.com/embed/TfnQHo9eX6Q?si=1cS2uQyepslvSx54',
     thumbnailUrl: 'https://img.youtube.com/vi/hiit-cardio/maxresdefault.jpg',
     category: 'HIIT',
     difficulty: 'intermediate',
@@ -71,7 +71,7 @@ const videoLibrary: Video[] = [
   {
     id: '4',
     title: 'Beginner Friendly Cardio Dance Workout for Weight Loss',
-    youtubeUrl: 'https://youtu.be/-hSma-BRzoo?si=iDNN4RPui0pqDc0-',
+    youtubeUrl: 'https://www.youtube.com/embed/ygAC0yJp1KU?si=SFKLorrgqpq_u0Sp',
     thumbnailUrl: 'https://img.youtube.com/vi/cardio-dance/maxresdefault.jpg',
     category: 'cardio',
     difficulty: 'beginner',
@@ -83,7 +83,7 @@ const videoLibrary: Video[] = [
   {
     id: '5',
     title: 'Full Body Weight Lifting Routine for Muscle Building',
-    youtubeUrl: 'https://youtu.be/qml_YVfm0z0?si=fljqicS0bdps-KV6',
+    youtubeUrl: 'https://www.youtube.com/embed/-p0PA9Zt8zk?si=eRmIFUtI_MqyvEx4',
     thumbnailUrl: 'https://img.youtube.com/vi/fullbody-weights/maxresdefault.jpg',
     category: 'weight lifting',
     difficulty: 'intermediate',
@@ -167,7 +167,7 @@ const videoLibrary: Video[] = [
   {
     id: '12',
     title: 'Upper Body Muscle Building Workout for Mass Gain',
-    youtubeUrl: 'https://www.youtube.com/watch?v=SBJCkZ6g1X0',
+    youtubeUrl: 'https://www.youtube.com/embed/8uUawnM-FD8?si=WFbPt2cwGgfVqXuH',
     thumbnailUrl: 'https://img.youtube.com/vi/upper-body-mass/maxresdefault.jpg',
     category: 'muscle building',
     difficulty: 'intermediate',
@@ -215,7 +215,7 @@ const videoLibrary: Video[] = [
   {
     id: '16',
     title: 'Yoga Flow for Flexibility and Mindfulness Practice',
-    youtubeUrl: 'https://www.youtube.com/watch?v=v7AYKMP6rOE',
+    youtubeUrl: 'https://www.youtube.com/embed/digpucxFbMo?si=mNdRgWfXhwHqQ4Wi',
     thumbnailUrl: 'https://img.youtube.com/vi/yoga-flow/maxresdefault.jpg',
     category: 'flexibility',
     difficulty: 'intermediate',
@@ -227,7 +227,7 @@ const videoLibrary: Video[] = [
   {
     id: '17',
     title: 'Sprint Interval Training for Explosive Cardio Fitness',
-    youtubeUrl: 'https://www.youtube.com/watch?v=KaL1xweKjs8',
+    youtubeUrl: 'https://www.youtube.com/embed/8uUawnM-FD8?si=WFbPt2cwGgfVqXuH',
     thumbnailUrl: 'https://img.youtube.com/vi/sprint-intervals/maxresdefault.jpg',
     category: 'cardio',
     difficulty: 'advanced',
@@ -239,7 +239,7 @@ const videoLibrary: Video[] = [
   {
     id: '18',
     title: 'Bodyweight Muscle Building Workout No Equipment Needed',
-    youtubeUrl: 'https://www.youtube.com/watch?v=AnYl6Nk9GOA',
+    youtubeUrl: 'https://www.youtube.com/embed/TJLKgWsS7vw?si=XSfPM23557f2hB6p',
     thumbnailUrl: 'https://img.youtube.com/vi/bodyweight-muscle/maxresdefault.jpg',
     category: 'muscle building',
     difficulty: 'beginner',
@@ -263,7 +263,7 @@ const videoLibrary: Video[] = [
   {
     id: '20',
     title: 'Powerlifting Fundamentals Squat Bench Deadlift Technique',
-    youtubeUrl: 'https://www.youtube.com/watch?v=IoW4eT_zWJc',
+    youtubeUrl: 'https://www.youtube.com/embed/digpucxFbMo?si=mNdRgWfXhwHqQ4Wi',
     thumbnailUrl: 'https://img.youtube.com/vi/powerlifting-basics/maxresdefault.jpg',
     category: 'deadlift',
     difficulty: 'intermediate',
@@ -299,7 +299,7 @@ const videoLibrary: Video[] = [
   {
     id: '23',
     title: 'Strength Endurance Circuit for Military Fitness Preparation',
-    youtubeUrl: 'https://www.youtube.com/watch?v=ys9FgKb7mWw',
+    youtubeUrl: 'https://www.youtube.com/embed/digpucxFbMo?si=mNdRgWfXhwHqQ4Wi',
     thumbnailUrl: 'https://img.youtube.com/vi/military-fitness/maxresdefault.jpg',
     category: 'cardio',
     difficulty: 'advanced',
@@ -347,7 +347,7 @@ const videoLibrary: Video[] = [
   {
     id: '27',
     title: 'Rehabilitation Exercise Program for Injury Prevention',
-    youtubeUrl: 'https://www.youtube.com/watch?v=Yp3ZwACK9v4',
+    youtubeUrl: 'https://www.youtube.com/embed/TJLKgWsS7vw?si=XSfPM23557f2hB6p',
     thumbnailUrl: 'https://img.youtube.com/vi/rehab-exercises/maxresdefault.jpg',
     category: 'flexibility',
     difficulty: 'beginner',
@@ -383,7 +383,7 @@ const videoLibrary: Video[] = [
   {
     id: '30',
     title: 'Advanced Fat Burning HIIT Circuit Training Session',
-    youtubeUrl: 'https://www.youtube.com/watch?v=4uKXoOjvGQ0',
+    youtubeUrl: 'https://www.youtube.com/embed/digpucxFbMo?si=mNdRgWfXhwHqQ4Wi',
     thumbnailUrl: 'https://img.youtube.com/vi/advanced-fat-burn/maxresdefault.jpg',
     category: 'fat loss',
     difficulty: 'advanced',
@@ -407,7 +407,7 @@ const videoLibrary: Video[] = [
   {
     id: '32',
     title: 'Competition Cutting Advanced Physique Preparation Techniques',
-    youtubeUrl: 'https://www.youtube.com/watch?v=vY5UhKW_t5c',
+    youtubeUrl: 'https://www.youtube.com/embed/TJLKgWsS7vw?si=XSfPM23557f2hB6p',
     thumbnailUrl: 'https://img.youtube.com/vi/advanced-cutting/maxresdefault.jpg',
     category: 'cutting',
     difficulty: 'advanced',
