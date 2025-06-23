@@ -21,9 +21,11 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
   const extractYouTubeId = (url: string) => {
     if (!url) return null;
     
+    // Handle various YouTube URL formats
     const patterns = [
       /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
-      /youtube\.com\/watch\?.*v=([^&\n?#]+)/
+      /youtube\.com\/watch\?.*v=([^&\n?#]+)/,
+      /^([a-zA-Z0-9_-]{11})$/ // Direct video ID
     ];
     
     for (const pattern of patterns) {
@@ -32,7 +34,20 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
         return match[1];
       }
     }
+    
+    // If it's already an embed URL, extract the ID
+    if (url.includes('youtube.com/embed/')) {
+      const embedMatch = url.match(/youtube\.com\/embed\/([^?&]+)/);
+      if (embedMatch) return embedMatch[1];
+    }
+    
     return null;
+  };
+
+  const getEmbedUrl = (url: string) => {
+    const videoId = extractYouTubeId(url);
+    if (!videoId) return null;
+    return `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1`;
   };
 
   const speakText = (text: string) => {
@@ -183,112 +198,116 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
-                {generatedPlan.matchedVideos.map((video: any, index: number) => (
-                  <div key={video.id} className="border rounded-lg p-4 bg-gray-50">
-                    {/* Audio Note Before */}
-                    {generatedPlan.audioNotes[index] && (
-                      <div className="mb-4 p-3 bg-blue-100 rounded-lg border-l-4 border-blue-500">
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center space-x-2">
-                            <Mic className="w-4 h-4 text-blue-600" />
-                            <span className="text-sm font-semibold text-blue-800">AI Coach Voice</span>
-                            <Badge variant="secondary" className="text-xs">
-                              {index === 0 ? '00:00' : 'Transition'}
-                            </Badge>
-                          </div>
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => speakText(generatedPlan.audioNotes[index])}
-                            disabled={isSpeaking}
-                            className="text-blue-600 border-blue-300 hover:bg-blue-50"
-                          >
-                            <Volume2 className="w-3 h-3 mr-1" />
-                            Play
-                          </Button>
-                        </div>
-                        <p className="text-blue-700 italic">"{generatedPlan.audioNotes[index]}"</p>
-                      </div>
-                    )}
-                    
-                    {/* Video Section */}
-                    <div className="space-y-4">
-                      <div className="flex items-center space-x-4">
-                        <div className="w-24 h-16 bg-gray-200 rounded flex items-center justify-center">
-                          {extractYouTubeId(video.youtubeUrl) ? (
-                            <iframe
-                              src={`https://www.youtube.com/embed/${extractYouTubeId(video.youtubeUrl)}`}
-                              title={video.title}
-                              className="w-full h-full rounded"
-                              frameBorder="0"
-                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                              allowFullScreen
-                            />
-                          ) : (
-                            <Play className="w-6 h-6 text-gray-400" />
-                          )}
-                        </div>
-                        <div className="flex-1">
-                          <h4 className="font-semibold text-gray-900">{video.title}</h4>
-                          <p className="text-sm text-gray-600 mt-1 line-clamp-2">{video.description}</p>
-                          <div className="flex items-center space-x-4 text-sm text-gray-600 mt-2">
-                            <span className="flex items-center space-x-1">
-                              <Clock className="w-3 h-3" />
-                              <span>{video.duration}min</span>
-                            </span>
-                            <Badge variant="secondary">{video.category}</Badge>
-                            <Badge className={getDifficultyColor(video.difficulty)}>
-                              {video.difficulty}
-                            </Badge>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      {/* Embedded YouTube Video */}
-                      <div className="w-full">
-                        <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
-                          {extractYouTubeId(video.youtubeUrl) ? (
-                            <iframe
-                              src={`https://www.youtube.com/embed/${extractYouTubeId(video.youtubeUrl)}`}
-                              title={video.title}
-                              className="w-full h-full"
-                              frameBorder="0"
-                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                              allowFullScreen
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-gray-500">
-                              <p>Video unavailable</p>
+                {generatedPlan.matchedVideos.map((video: any, index: number) => {
+                  const embedUrl = getEmbedUrl(video.youtubeUrl);
+                  
+                  return (
+                    <div key={video.id} className="border rounded-lg p-4 bg-gray-50">
+                      {/* Audio Note Before */}
+                      {generatedPlan.audioNotes[index] && (
+                        <div className="mb-4 p-3 bg-blue-100 rounded-lg border-l-4 border-blue-500">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center space-x-2">
+                              <Mic className="w-4 h-4 text-blue-600" />
+                              <span className="text-sm font-semibold text-blue-800">AI Coach Voice</span>
+                              <Badge variant="secondary" className="text-xs">
+                                {index === 0 ? '00:00' : 'Transition'}
+                              </Badge>
                             </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Final Audio Note */}
-                    {index === generatedPlan.matchedVideos.length - 1 && generatedPlan.audioNotes[index + 1] && (
-                      <div className="mt-4 p-3 bg-green-100 rounded-lg border-l-4 border-green-500">
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center space-x-2">
-                            <Mic className="w-4 h-4 text-green-600" />
-                            <span className="text-sm font-semibold text-green-800">Session Complete</span>
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => speakText(generatedPlan.audioNotes[index])}
+                              disabled={isSpeaking}
+                              className="text-blue-600 border-blue-300 hover:bg-blue-50"
+                            >
+                              <Volume2 className="w-3 h-3 mr-1" />
+                              Play
+                            </Button>
                           </div>
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => speakText(generatedPlan.audioNotes[index + 1])}
-                            disabled={isSpeaking}
-                            className="text-green-600 border-green-300 hover:bg-green-50"
-                          >
-                            <Volume2 className="w-3 h-3 mr-1" />
-                            Play
-                          </Button>
+                          <p className="text-blue-700 italic">"{generatedPlan.audioNotes[index]}"</p>
                         </div>
-                        <p className="text-green-700 italic">"{generatedPlan.audioNotes[index + 1]}"</p>
+                      )}
+                      
+                      {/* Video Section */}
+                      <div className="space-y-4">
+                        <div className="flex items-center space-x-4">
+                          <div className="w-24 h-16 bg-gray-200 rounded flex items-center justify-center overflow-hidden">
+                            {embedUrl ? (
+                              <iframe
+                                src={embedUrl}
+                                title={video.title}
+                                className="w-full h-full rounded"
+                                frameBorder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                allowFullScreen
+                              />
+                            ) : (
+                              <Play className="w-6 h-6 text-gray-400" />
+                            )}
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="font-semibold text-gray-900">{video.title}</h4>
+                            <p className="text-sm text-gray-600 mt-1 line-clamp-2">{video.description}</p>
+                            <div className="flex items-center space-x-4 text-sm text-gray-600 mt-2">
+                              <span className="flex items-center space-x-1">
+                                <Clock className="w-3 h-3" />
+                                <span>{video.duration}min</span>
+                              </span>
+                              <Badge variant="secondary">{video.category}</Badge>
+                              <Badge className={getDifficultyColor(video.difficulty)}>
+                                {video.difficulty}
+                              </Badge>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Embedded YouTube Video */}
+                        <div className="w-full">
+                          <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
+                            {embedUrl ? (
+                              <iframe
+                                src={embedUrl}
+                                title={video.title}
+                                className="w-full h-full"
+                                frameBorder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                allowFullScreen
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-gray-500">
+                                <p>Video unavailable</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                    )}
-                  </div>
-                ))}
+
+                      {/* Final Audio Note */}
+                      {index === generatedPlan.matchedVideos.length - 1 && generatedPlan.audioNotes[index + 1] && (
+                        <div className="mt-4 p-3 bg-green-100 rounded-lg border-l-4 border-green-500">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center space-x-2">
+                              <Mic className="w-4 h-4 text-green-600" />
+                              <span className="text-sm font-semibold text-green-800">Session Complete</span>
+                            </div>
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => speakText(generatedPlan.audioNotes[index + 1])}
+                              disabled={isSpeaking}
+                              className="text-green-600 border-green-300 hover:bg-green-50"
+                            >
+                              <Volume2 className="w-3 h-3 mr-1" />
+                              Play
+                            </Button>
+                          </div>
+                          <p className="text-green-700 italic">"{generatedPlan.audioNotes[index + 1]}"</p>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </CardContent>
           </Card>

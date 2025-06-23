@@ -30,9 +30,11 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
   const extractYouTubeId = (url: string) => {
     if (!url) return null;
     
+    // Handle various YouTube URL formats
     const patterns = [
       /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
-      /youtube\.com\/watch\?.*v=([^&\n?#]+)/
+      /youtube\.com\/watch\?.*v=([^&\n?#]+)/,
+      /^([a-zA-Z0-9_-]{11})$/ // Direct video ID
     ];
     
     for (const pattern of patterns) {
@@ -41,7 +43,26 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
         return match[1];
       }
     }
+    
+    // If it's already an embed URL, extract the ID
+    if (url.includes('youtube.com/embed/')) {
+      const embedMatch = url.match(/youtube\.com\/embed\/([^?&]+)/);
+      if (embedMatch) return embedMatch[1];
+    }
+    
     return null;
+  };
+
+  const getEmbedUrl = (url: string) => {
+    const videoId = extractYouTubeId(url);
+    if (!videoId) return null;
+    return `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1`;
+  };
+
+  const getThumbnailUrl = (url: string) => {
+    const videoId = extractYouTubeId(url);
+    if (!videoId) return null;
+    return `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
   };
 
   const handleAddVideo = () => {
@@ -269,60 +290,71 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {videos.map((video) => (
-                  <div key={video.id} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
-                    <div className="aspect-video bg-gray-100 relative">
-                      {extractYouTubeId(video.youtubeUrl) ? (
-                        <iframe
-                          src={`${video.youtubeUrl}`}
-                          title={video.title}
-                          className="w-full h-full"
-                          frameBorder="0"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-gray-500">
-                          <Youtube className="w-8 h-8 mb-2" />
-                          <p>Invalid YouTube URL</p>
+                {videos.map((video) => {
+                  const embedUrl = getEmbedUrl(video.youtubeUrl);
+                  const thumbnailUrl = getThumbnailUrl(video.youtubeUrl);
+                  
+                  return (
+                    <div key={video.id} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
+                      <div className="aspect-video bg-gray-100 relative">
+                        {embedUrl ? (
+                          <iframe
+                            src={embedUrl}
+                            title={video.title}
+                            className="w-full h-full"
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            allowFullScreen
+                          />
+                        ) : thumbnailUrl ? (
+                          <img 
+                            src={thumbnailUrl} 
+                            alt={video.title}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex flex-col items-center justify-center text-gray-500">
+                            <Youtube className="w-8 h-8 mb-2" />
+                            <p className="text-sm">Invalid YouTube URL</p>
+                          </div>
+                        )}
+                        <div className="absolute bottom-2 right-2 bg-black/75 text-white px-2 py-1 rounded text-xs">
+                          {video.duration}min
                         </div>
-                      )}
-                      <div className="absolute bottom-2 right-2 bg-black/75 text-white px-2 py-1 rounded text-xs">
-                        {video.duration}min
+                      </div>
+                      <div className="p-4">
+                        <h4 className="font-semibold text-gray-900 mb-2 line-clamp-2">{video.title}</h4>
+                        <div className="flex items-center justify-between mb-3">
+                          <Badge variant="secondary">{video.category}</Badge>
+                          <Badge className={getDifficultyColor(video.difficulty)}>
+                            {video.difficulty}
+                          </Badge>
+                        </div>
+                        {video.description && (
+                          <p className="text-sm text-gray-600 mb-3 line-clamp-2">{video.description}</p>
+                        )}
+                        <div className="flex items-center justify-between">
+                          <a 
+                            href={video.youtubeUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-red-500 hover:text-red-600 text-sm font-medium"
+                          >
+                            View on YouTube
+                          </a>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => deleteVideo(video.id)}
+                            className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
                       </div>
                     </div>
-                    <div className="p-4">
-                      <h4 className="font-semibold text-gray-900 mb-2 line-clamp-2">{video.title}</h4>
-                      <div className="flex items-center justify-between mb-3">
-                        <Badge variant="secondary">{video.category}</Badge>
-                        <Badge className={getDifficultyColor(video.difficulty)}>
-                          {video.difficulty}
-                        </Badge>
-                      </div>
-                      {video.description && (
-                        <p className="text-sm text-gray-600 mb-3 line-clamp-2">{video.description}</p>
-                      )}
-                      <div className="flex items-center justify-between">
-                        <a 
-                          href={video.youtubeUrl} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-red-500 hover:text-red-600 text-sm font-medium"
-                        >
-                          View on YouTube
-                        </a>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => deleteVideo(video.id)}
-                          className="text-red-500 hover:text-red-600 hover:bg-red-50"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </CardContent>
