@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Plus, Edit, Trash2, Play, Clock, Tag, Users, TrendingUp, Star, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -22,6 +21,7 @@ const AdminDashboard = () => {
     machineType: "",
     duration: "",
     description: "",
+    tags: "",
   });
 
   // Combine user-added videos with the video library for display
@@ -36,6 +36,7 @@ const AdminDashboard = () => {
       machineType: "",
       duration: "",
       description: "",
+      tags: "",
     });
     setShowAddForm(false);
     setEditingVideo(null);
@@ -53,6 +54,7 @@ const AdminDashboard = () => {
       ...formData,
       duration: parseInt(formData.duration),
       thumbnailUrl: `https://img.youtube.com/vi/${extractYouTubeId(formData.youtubeUrl)}/maxresdefault.jpg`,
+      tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0),
     };
 
     if (editingVideo) {
@@ -73,6 +75,7 @@ const AdminDashboard = () => {
       machineType: video.machineType,
       duration: video.duration.toString(),
       description: video.description,
+      tags: video.tags.join(', '),
     });
     setEditingVideo(video);
     setShowAddForm(true);
@@ -316,6 +319,17 @@ const AdminDashboard = () => {
                     placeholder="Brief description of the workout"
                   />
                 </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Tags (comma-separated)
+                  </label>
+                  <Input
+                    value={formData.tags}
+                    onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
+                    placeholder="hiit, cardio, strength, etc."
+                  />
+                </div>
                 
                 <div className="flex space-x-4">
                   <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
@@ -378,6 +392,18 @@ const AdminDashboard = () => {
                           </Badge>
                           <Badge variant="outline">{video.machineType}</Badge>
                         </div>
+                        {video.tags && video.tags.length > 0 && (
+                          <div className="flex items-center space-x-1 mt-2">
+                            <Tag className="w-3 h-3 text-gray-400" />
+                            <div className="flex flex-wrap gap-1">
+                              {video.tags.map((tag, index) => (
+                                <Badge key={index} variant="outline" className="text-xs">
+                                  {tag}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                       
                       <div className="flex items-center space-x-2">
