@@ -11,6 +11,7 @@ export interface Video {
   machineType: string;
   duration: number;
   description: string;
+  tags: string[];
   createdAt: string;
 }
 
@@ -35,19 +36,21 @@ export const useVideoStore = create<VideoStore>((set, get) => ({
       difficulty: "beginner",
       machineType: "bodyweight",
       duration: 20,
-      description: "A complete full body HIIT workout perfect for beginners",
+      description: "High-intensity interval training perfect for beginners. This workout combines cardio and strength exercises to burn calories and build endurance. No equipment needed, just your body weight.",
+      tags: ["hiit", "cardio", "beginner", "bodyweight", "fat loss", "conditioning"],
       createdAt: "2024-01-15T00:00:00.000Z"
     },
     {
       id: "2",
-      title: "Advanced Strength Training",
+      title: "Advanced Strength Training with Dumbbells",
       youtubeUrl: "https://youtube.com/watch?v=strength456",
       thumbnailUrl: "https://img.youtube.com/vi/strength456/maxresdefault.jpg",
       category: "Strength",
       difficulty: "advanced",
       machineType: "dumbbells",
       duration: 45,
-      description: "Intensive strength training for experienced athletes",
+      description: "Intensive strength training session using dumbbells for muscle building. Focus on compound movements including deadlifts, squats, and presses. Perfect for experienced lifters.",
+      tags: ["strength", "dumbbells", "advanced", "muscle", "building", "compound"],
       createdAt: "2024-01-14T00:00:00.000Z"
     },
     {
@@ -59,56 +62,100 @@ export const useVideoStore = create<VideoStore>((set, get) => ({
       difficulty: "beginner",
       machineType: "bodyweight",
       duration: 25,
-      description: "Gentle yoga flow to improve flexibility and reduce stress",
+      description: "Gentle yoga flow designed to improve flexibility and reduce stress. Perfect for beginners or as a recovery session. Focus on breathing and mindful movement.",
+      tags: ["yoga", "flexibility", "beginner", "stretching", "relaxation", "mindfulness"],
       createdAt: "2024-01-12T00:00:00.000Z"
     },
     {
       id: "4",
-      title: "Treadmill Cardio Blast",
+      title: "Treadmill Cardio Blast - Fat Burning",
       youtubeUrl: "https://youtube.com/watch?v=cardio789",
       thumbnailUrl: "https://img.youtube.com/vi/cardio789/maxresdefault.jpg",
       category: "Cardio",
       difficulty: "intermediate",
       machineType: "treadmill",
       duration: 30,
-      description: "High energy cardio workout on the treadmill",
+      description: "High-energy cardio workout on the treadmill designed for fat loss. Interval training with varying speeds and inclines to maximize calorie burn.",
+      tags: ["cardio", "treadmill", "intermediate", "running", "fat loss", "intervals"],
       createdAt: "2024-01-13T00:00:00.000Z"
     },
     {
       id: "5",
-      title: "Barbell Power Training",
+      title: "Barbell Deadlift Training - Power Building",
       youtubeUrl: "https://youtube.com/watch?v=barbell101",
       thumbnailUrl: "https://img.youtube.com/vi/barbell101/maxresdefault.jpg",
       category: "Strength",
       difficulty: "advanced",
       machineType: "barbell",
       duration: 50,
-      description: "Power training with barbell for serious lifters",
+      description: "Comprehensive deadlift training session focusing on proper form and progressive overload. Includes conventional, sumo, and Romanian deadlift variations.",
+      tags: ["strength", "barbell", "advanced", "deadlift", "powerlifting", "form"],
       createdAt: "2024-01-10T00:00:00.000Z"
     },
     {
       id: "6",
-      title: "Pilates Fundamentals - Full Body",
+      title: "Pilates Fundamentals - Core Strength",
       youtubeUrl: "https://youtube.com/watch?v=pilates123",
       thumbnailUrl: "https://img.youtube.com/vi/pilates123/maxresdefault.jpg",
       category: "Pilates",
       difficulty: "beginner",
       machineType: "bodyweight",
       duration: 28,
-      description: "Introduction to Pilates with full body exercises",
+      description: "Introduction to Pilates focusing on core strength and stability. Learn fundamental movements and breathing techniques for better posture and control.",
+      tags: ["pilates", "core", "beginner", "stability", "posture", "control"],
       createdAt: "2024-01-11T00:00:00.000Z"
     },
     {
       id: "7",
-      title: "Cable Machine Full Body Workout",
+      title: "Cable Machine Full Body Strength",
       youtubeUrl: "https://youtube.com/watch?v=cable456",
       thumbnailUrl: "https://img.youtube.com/vi/cable456/maxresdefault.jpg",
       category: "Strength",
       difficulty: "intermediate",
       machineType: "cable",
       duration: 35,
-      description: "Complete workout using cable machines for all muscle groups",
+      description: "Complete workout using cable machines targeting all major muscle groups. Perfect for intermediate lifters looking for variety in their strength training.",
+      tags: ["strength", "cable", "intermediate", "full body", "variety", "muscle"],
       createdAt: "2024-01-09T00:00:00.000Z"
+    },
+    {
+      id: "8",
+      title: "Beginner Cardio - Walking and Light Jogging",
+      youtubeUrl: "https://youtube.com/watch?v=beginner789",
+      thumbnailUrl: "https://img.youtube.com/vi/beginner789/maxresdefault.jpg",
+      category: "Cardio",
+      difficulty: "beginner",
+      machineType: "treadmill",
+      duration: 20,
+      description: "Perfect introduction to cardio exercise. Start with walking and progress to light jogging. Great for building cardiovascular endurance safely.",
+      tags: ["cardio", "beginner", "walking", "jogging", "endurance", "safe"],
+      createdAt: "2024-01-08T00:00:00.000Z"
+    },
+    {
+      id: "9",
+      title: "Advanced HIIT - Maximum Intensity",
+      youtubeUrl: "https://youtube.com/watch?v=hiit999",
+      thumbnailUrl: "https://img.youtube.com/vi/hiit999/maxresdefault.jpg",
+      category: "HIIT",
+      difficulty: "advanced",
+      machineType: "bodyweight",
+      duration: 25,
+      description: "Maximum intensity HIIT workout for advanced athletes. Push your limits with explosive movements and minimal rest periods.",
+      tags: ["hiit", "advanced", "intensity", "explosive", "athletic", "challenging"],
+      createdAt: "2024-01-07T00:00:00.000Z"
+    },
+    {
+      id: "10",
+      title: "Intermediate Yoga - Strength and Balance",
+      youtubeUrl: "https://youtube.com/watch?v=yoga456",
+      thumbnailUrl: "https://img.youtube.com/vi/yoga456/maxresdefault.jpg",
+      category: "Yoga",
+      difficulty: "intermediate",
+      machineType: "bodyweight",
+      duration: 40,
+      description: "Build strength and improve balance with challenging yoga poses. Perfect progression from beginner level with more complex asanas.",
+      tags: ["yoga", "intermediate", "strength", "balance", "poses", "progression"],
+      createdAt: "2024-01-06T00:00:00.000Z"
     }
   ],
 
@@ -141,18 +188,21 @@ export const useVideoStore = create<VideoStore>((set, get) => ({
   generateWorkoutPlan: (query: string) => {
     const { videoLibrary } = get();
     
-    // Simple AI simulation based on query keywords
+    // Enhanced AI simulation based on query keywords
     const queryLower = query.toLowerCase();
     let difficulty = 'beginner';
-    let category = 'general fitness';
+    let category = '';
     let goal = 'general fitness';
+    let matchedVideos: Video[] = [];
     
+    // Determine difficulty
     if (queryLower.includes('advanced') || queryLower.includes('expert')) {
       difficulty = 'advanced';
     } else if (queryLower.includes('intermediate')) {
       difficulty = 'intermediate';
     }
     
+    // Determine category and goal
     if (queryLower.includes('strength') || queryLower.includes('muscle') || queryLower.includes('lifting')) {
       category = 'Strength';
       goal = 'muscle building';
@@ -165,23 +215,42 @@ export const useVideoStore = create<VideoStore>((set, get) => ({
     } else if (queryLower.includes('hiit')) {
       category = 'HIIT';
       goal = 'conditioning';
+    } else if (queryLower.includes('pilates')) {
+      category = 'Pilates';
+      goal = 'core strength';
     } else if (queryLower.includes('deadlift')) {
-      category = 'deadlift';
-      goal = 'general fitness';
+      // Special case for deadlift
+      matchedVideos = videoLibrary.filter(video => 
+        video.tags.includes('deadlift') || video.title.toLowerCase().includes('deadlift')
+      );
+      goal = 'deadlift training';
     }
     
-    // Filter videos based on the analysis
-    let matchedVideos = videoLibrary.filter(video => {
-      const matchesDifficulty = video.difficulty === difficulty;
-      const matchesCategory = video.category.toLowerCase().includes(category.toLowerCase()) || 
-                             category === 'general fitness';
-      return matchesDifficulty || matchesCategory;
-    }).slice(0, 5);
+    // Filter videos if no specific deadlift search
+    if (matchedVideos.length === 0) {
+      matchedVideos = videoLibrary.filter(video => {
+        const matchesDifficulty = video.difficulty === difficulty;
+        const matchesCategory = category ? video.category === category : true;
+        const matchesTags = video.tags.some(tag => 
+          queryLower.includes(tag) || tag.includes(queryLower.split(' ')[0])
+        );
+        
+        return matchesDifficulty || matchesCategory || matchesTags;
+      });
+    }
     
-    // If no matches, use some default videos
+    // If still no matches, get videos by difficulty at least
+    if (matchedVideos.length === 0) {
+      matchedVideos = videoLibrary.filter(video => video.difficulty === difficulty);
+    }
+    
+    // If still no matches, use default videos
     if (matchedVideos.length === 0) {
       matchedVideos = videoLibrary.slice(0, 3);
     }
+    
+    // Limit to 5 videos max
+    matchedVideos = matchedVideos.slice(0, 5);
     
     // Generate audio notes for the workout
     const audioNotes = [
@@ -190,12 +259,22 @@ export const useVideoStore = create<VideoStore>((set, get) => ({
       "Excellent work so far! You're building strength and endurance. Time to challenge yourself with the next exercise.",
       "Keep that momentum going! Focus on quality over quantity. Let's transition to our next training segment.",
       "Fantastic effort! You're really pushing your limits today. Ready for the next part of your workout?",
-      "Amazing progress! Remember to listen to your body and maintain good form. Here comes another great exercise."
+      "Amazing progress! Remember to listen to your body and maintain good form. Here comes another great exercise.",
+      "Outstanding work! You've completed an incredible training session. Take a moment to stretch and hydrate."
     ];
+    
+    console.log("Smart Workout Generation:", {
+      query: queryLower,
+      difficulty,
+      category,
+      goal,
+      matchedCount: matchedVideos.length,
+      videoTitles: matchedVideos.map(v => v.title)
+    });
     
     return {
       matchedVideos,
-      category,
+      category: category || 'Mixed',
       difficulty,
       goal,
       audioNotes
