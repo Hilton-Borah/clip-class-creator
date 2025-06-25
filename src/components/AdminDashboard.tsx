@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Edit, Trash2, Play, Clock, Tag, Users, TrendingUp, Star, ChevronDown, ChevronUp } from "lucide-react";
+import { Plus, Edit, Trash2, Play, Clock, Tag, Users, TrendingUp, Star, ChevronDown, ChevronUp, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,7 +7,11 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useVideoStore, Video } from "../store/videoStore";
 
-const AdminDashboard = () => {
+interface AdminDashboardProps {
+  onBack?: () => void;
+}
+
+const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
   const { videos, videoLibrary, addVideo, updateVideo, deleteVideo } = useVideoStore();
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingVideo, setEditingVideo] = useState<Video | null>(null);
@@ -126,9 +130,22 @@ const AdminDashboard = () => {
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-              <p className="text-gray-600 mt-1">Manage your video library and workout content</p>
+            <div className="flex items-center space-x-4">
+              {onBack && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={onBack}
+                  className="flex items-center space-x-2"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  <span>Back</span>
+                </Button>
+              )}
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+                <p className="text-gray-600 mt-1">Manage your video library and workout content</p>
+              </div>
             </div>
             <Button 
               onClick={() => setShowAddForm(!showAddForm)}
