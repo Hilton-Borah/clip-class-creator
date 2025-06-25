@@ -43,7 +43,7 @@ export const useVideoStore = create<VideoStore>((set, get) => ({
     {
       id: "2",
       title: "Advanced Strength Training with Dumbbells",
-      youtubeUrl: "https://youtube.com/watch?v=strength456",
+      youtubeUrl: "https://www.youtube.com/watch?v=K56Z12XNQ5c",
       thumbnailUrl: "https://img.youtube.com/vi/strength456/maxresdefault.jpg",
       category: "Strength",
       difficulty: "advanced",
@@ -56,7 +56,7 @@ export const useVideoStore = create<VideoStore>((set, get) => ({
     {
       id: "3",
       title: "Relaxing Yoga Flow for Flexibility",
-      youtubeUrl: "https://youtube.com/watch?v=yoga123",
+      youtubeUrl: "https://www.youtube.com/watch?v=7KSNmziMqog",
       thumbnailUrl: "https://img.youtube.com/vi/yoga123/maxresdefault.jpg",
       category: "Yoga",
       difficulty: "beginner",
@@ -69,7 +69,7 @@ export const useVideoStore = create<VideoStore>((set, get) => ({
     {
       id: "4",
       title: "Treadmill Cardio Blast - Fat Burning",
-      youtubeUrl: "https://youtube.com/watch?v=cardio789",
+      youtubeUrl: "https://www.youtube.com/watch?v=IpUQElrETw4",
       thumbnailUrl: "https://img.youtube.com/vi/cardio789/maxresdefault.jpg",
       category: "Cardio",
       difficulty: "intermediate",
@@ -82,7 +82,7 @@ export const useVideoStore = create<VideoStore>((set, get) => ({
     {
       id: "5",
       title: "Barbell Deadlift Training - Power Building",
-      youtubeUrl: "https://youtube.com/watch?v=barbell101",
+      youtubeUrl: "https://www.youtube.com/watch?v=1aVw1gZ9Ncg",
       thumbnailUrl: "https://img.youtube.com/vi/barbell101/maxresdefault.jpg",
       category: "Strength",
       difficulty: "advanced",
@@ -95,7 +95,7 @@ export const useVideoStore = create<VideoStore>((set, get) => ({
     {
       id: "6",
       title: "Pilates Fundamentals - Core Strength",
-      youtubeUrl: "https://youtube.com/watch?v=pilates123",
+      youtubeUrl: "https://www.youtube.com/watch?v=kGZjouuqY4E",
       thumbnailUrl: "https://img.youtube.com/vi/pilates123/maxresdefault.jpg",
       category: "Pilates",
       difficulty: "beginner",
@@ -108,7 +108,7 @@ export const useVideoStore = create<VideoStore>((set, get) => ({
     {
       id: "7",
       title: "Cable Machine Full Body Strength",
-      youtubeUrl: "https://youtube.com/watch?v=cable456",
+      youtubeUrl: "https://www.youtube.com/watch?v=-Nr31VymCYM",
       thumbnailUrl: "https://img.youtube.com/vi/cable456/maxresdefault.jpg",
       category: "Strength",
       difficulty: "intermediate",
@@ -121,7 +121,7 @@ export const useVideoStore = create<VideoStore>((set, get) => ({
     {
       id: "8",
       title: "Beginner Cardio - Walking and Light Jogging",
-      youtubeUrl: "https://youtube.com/watch?v=beginner789",
+      youtubeUrl: "https://www.youtube.com/watch?v=1w7eWrowb1s",
       thumbnailUrl: "https://img.youtube.com/vi/beginner789/maxresdefault.jpg",
       category: "Cardio",
       difficulty: "beginner",
@@ -134,7 +134,7 @@ export const useVideoStore = create<VideoStore>((set, get) => ({
     {
       id: "9",
       title: "Advanced HIIT - Maximum Intensity",
-      youtubeUrl: "https://youtube.com/watch?v=hiit999",
+      youtubeUrl: "https://www.youtube.com/watch?v=Arbpo7cWyno",
       thumbnailUrl: "https://img.youtube.com/vi/hiit999/maxresdefault.jpg",
       category: "HIIT",
       difficulty: "advanced",
@@ -147,7 +147,7 @@ export const useVideoStore = create<VideoStore>((set, get) => ({
     {
       id: "10",
       title: "Intermediate Yoga - Strength and Balance",
-      youtubeUrl: "https://youtube.com/watch?v=yoga456",
+      youtubeUrl: "https://www.youtube.com/watch?v=3B2hVhSHd-s",
       thumbnailUrl: "https://img.youtube.com/vi/yoga456/maxresdefault.jpg",
       category: "Yoga",
       difficulty: "intermediate",
