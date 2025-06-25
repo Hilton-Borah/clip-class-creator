@@ -25,6 +25,7 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
   const [selectedDifficulty, setSelectedDifficulty] = useState("");
   const [filteredVideos, setFilteredVideos] = useState<any[]>([]);
   const [isFiltering, setIsFiltering] = useState(false);
+  const [hasFiltered, setHasFiltered] = useState(false);
 
   // Use combined video data (library + user added videos)
   const allVideos = useMemo(() => [...videoLibrary, ...videos], [videoLibrary, videos]);
@@ -134,7 +135,18 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
     }
     
     setFilteredVideos(filtered);
+    setHasFiltered(true);
     setIsFiltering(false);
+    
+    console.log("Filtered Videos:", filtered);
+  };
+
+  const clearFilters = () => {
+    setSelectedDuration("");
+    setSelectedMachine("");
+    setSelectedDifficulty("");
+    setFilteredVideos([]);
+    setHasFiltered(false);
   };
 
   const getDifficultyColor = (difficulty: string) => {
@@ -446,23 +458,34 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
                   </Select>
                 </div>
 
-                <Button 
-                  onClick={filterVideos}
-                  disabled={isFiltering || (!selectedDuration && !selectedMachine && !selectedDifficulty)}
-                  className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
-                >
-                  {isFiltering ? (
-                    <>
-                      <div className="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Filtering...
-                    </>
-                  ) : (
-                    <>
-                      <Play className="w-4 h-4 mr-2" />
-                      GENERATE CLASS
-                    </>
+                <div className="flex space-x-2">
+                  <Button 
+                    onClick={filterVideos}
+                    disabled={isFiltering || (!selectedDuration && !selectedMachine && !selectedDifficulty)}
+                    className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+                  >
+                    {isFiltering ? (
+                      <>
+                        <div className="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        Filtering...
+                      </>
+                    ) : (
+                      <>
+                        <Play className="w-4 h-4 mr-2" />
+                        GENERATE CLASS
+                      </>
+                    )}
+                  </Button>
+                  {hasFiltered && (
+                    <Button 
+                      onClick={clearFilters}
+                      variant="outline"
+                      className="px-4"
+                    >
+                      Clear
+                    </Button>
                   )}
-                </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -473,7 +496,7 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
               <CardTitle className="text-cyan-700">Generated Class Preview</CardTitle>
             </CardHeader>
             <CardContent>
-              {filteredVideos.length > 0 ? (
+              {hasFiltered && filteredVideos.length > 0 ? (
                 <div className="space-y-4">
                   <div className="text-sm text-cyan-600 mb-4">
                     Found {filteredVideos.length} matching videos for your criteria
@@ -502,6 +525,7 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
                             </div>
                             <div className="flex-1 min-w-0">
                               <h4 className="font-medium text-sm text-gray-900 truncate">{video.title}</h4>
+                              <p className="text-xs text-gray-600 mt-1 line-clamp-2">{video.description}</p>
                               <div className="flex items-center space-x-2 text-xs text-gray-600 mt-1">
                                 <span>{video.duration}min</span>
                                 <Badge variant="secondary" className="text-xs">{video.machineType}</Badge>
@@ -515,6 +539,15 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
                       );
                     })}
                   </div>
+                </div>
+              ) : hasFiltered && filteredVideos.length === 0 ? (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Search className="w-8 h-8 text-gray-400" />
+                  </div>
+                  <p className="text-gray-600 text-sm">
+                    No videos found matching your criteria. Try adjusting your filters.
+                  </p>
                 </div>
               ) : (
                 <div className="text-center py-8">
