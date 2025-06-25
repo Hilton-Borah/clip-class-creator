@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Play, Settings, Search, Plus } from "lucide-react";
 import AdminDashboard from "../components/AdminDashboard";
@@ -8,7 +7,7 @@ const Index = () => {
   const [currentView, setCurrentView] = useState<'home' | 'admin' | 'search'>('home');
 
   if (currentView === 'admin') {
-    return <AdminDashboard onBack={() => setCurrentView('home')} />;
+    return <AdminDashboard />;
   }
 
   if (currentView === 'search') {
