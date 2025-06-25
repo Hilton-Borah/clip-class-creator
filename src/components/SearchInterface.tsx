@@ -12,7 +12,7 @@ interface SearchInterfaceProps {
 }
 
 const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
-  const { generateWorkoutPlan } = useVideoStore();
+  const { generateWorkoutPlan, videoLibrary, videos } = useVideoStore();
   const [isGenerating, setIsGenerating] = useState(false);
   const [smartQuery, setSmartQuery] = useState("");
   const [generatedPlan, setGeneratedPlan] = useState<any>(null);
@@ -26,59 +26,8 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
   const [filteredVideos, setFilteredVideos] = useState<any[]>([]);
   const [isFiltering, setIsFiltering] = useState(false);
 
-  // Sample video data with extended properties
-  const sampleVideos = [
-    {
-      id: 1,
-      title: "Beginner Dumbbell Workout",
-      description: "Perfect introduction to dumbbell exercises for beginners",
-      youtubeUrl: "https://www.youtube.com/watch?v=M0uO8X3_tEA",
-      duration: 15,
-      category: "strength",
-      difficulty: "beginner",
-      machineType: "dumbbells"
-    },
-    {
-      id: 2,
-      title: "Advanced Barbell Training",
-      description: "Intensive barbell training for experienced lifters",
-      youtubeUrl: "https://www.youtube.com/watch?v=4BOTvaRaDjI",
-      duration: 30,
-      category: "strength",
-      difficulty: "advanced",
-      machineType: "barbell"
-    },
-    {
-      id: 3,
-      title: "Treadmill HIIT Cardio",
-      description: "High-intensity interval training on treadmill",
-      youtubeUrl: "https://www.youtube.com/watch?v=ml6cT4AZdqI",
-      duration: 20,
-      category: "cardio",
-      difficulty: "intermediate",
-      machineType: "treadmill"
-    },
-    {
-      id: 4,
-      title: "Cable Machine Full Body",
-      description: "Complete body workout using cable machines",
-      youtubeUrl: "https://www.youtube.com/watch?v=gC_L9qAHVJ8",
-      duration: 45,
-      category: "strength",
-      difficulty: "intermediate",
-      machineType: "cable"
-    },
-    {
-      id: 5,
-      title: "Bodyweight Beginner Routine",
-      description: "No equipment needed - perfect for home workouts",
-      youtubeUrl: "https://www.youtube.com/watch?v=IODxDxX7oi4",
-      duration: 25,
-      category: "bodyweight",
-      difficulty: "beginner",
-      machineType: "bodyweight"
-    }
-  ];
+  // Use combined video data (library + user added videos)
+  const allVideos = useMemo(() => [...videoLibrary, ...videos], [videoLibrary, videos]);
 
   const extractYouTubeId = (url: string) => {
     if (!url) return null;
@@ -164,7 +113,7 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    let filtered = sampleVideos;
+    let filtered = allVideos;
     
     if (selectedDuration) {
       const duration = parseInt(selectedDuration);
@@ -189,7 +138,7 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
   };
 
   const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
+    switch (difficulty?.toLowerCase()) {
       case 'beginner': return 'bg-green-100 text-green-800';
       case 'intermediate': return 'bg-yellow-100 text-yellow-800';
       case 'advanced': return 'bg-red-100 text-red-800';
@@ -472,11 +421,13 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
                       <SelectValue placeholder="Select machine type" />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="bodyweight">Bodyweight</SelectItem>
                       <SelectItem value="dumbbells">Dumbbells</SelectItem>
                       <SelectItem value="barbell">Barbell</SelectItem>
                       <SelectItem value="treadmill">Treadmill</SelectItem>
                       <SelectItem value="cable">Cable Machine</SelectItem>
-                      <SelectItem value="bodyweight">Bodyweight</SelectItem>
+                      <SelectItem value="resistance-bands">Resistance Bands</SelectItem>
+                      <SelectItem value="kettlebells">Kettlebells</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

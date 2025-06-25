@@ -1,40 +1,90 @@
-import { useState } from "react";
-import { ArrowLeft, Plus, Edit, Trash2, Youtube, Clock, Star, Tag } from "lucide-react";
+
+import { useState, useEffect } from "react";
+import { Plus, Edit, Trash2, Play, Clock, Tag, Users, TrendingUp, Star, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { useVideoStore } from "../store/videoStore";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useVideoStore, Video } from "../store/videoStore";
 
-interface AdminDashboardProps {
-  onBack: () => void;
-}
-
-const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
-  const { videos, addVideo, deleteVideo } = useVideoStore();
-  const [isAddingVideo, setIsAddingVideo] = useState(false);
+const AdminDashboard = () => {
+  const { videos, videoLibrary, addVideo, updateVideo, deleteVideo } = useVideoStore();
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [editingVideo, setEditingVideo] = useState<Video | null>(null);
+  const [expandedVideo, setExpandedVideo] = useState<string | null>(null);
   
-  const [newVideo, setNewVideo] = useState({
+  const [formData, setFormData] = useState({
     title: "",
     youtubeUrl: "",
     category: "",
-    difficulty: "beginner" as "beginner" | "intermediate" | "advanced",
+    difficulty: "",
+    machineType: "",
     duration: "",
     description: "",
-    tags: ""
   });
+
+  // Combine user-added videos with the video library for display
+  const allVideos = [...videoLibrary, ...videos];
+
+  const resetForm = () => {
+    setFormData({
+      title: "",
+      youtubeUrl: "",
+      category: "",
+      difficulty: "",
+      machineType: "",
+      duration: "",
+      description: "",
+    });
+    setShowAddForm(false);
+    setEditingVideo(null);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!formData.title || !formData.youtubeUrl || !formData.category || !formData.difficulty || !formData.machineType || !formData.duration) {
+      alert("Please fill in all required fields");
+      return;
+    }
+
+    const videoData = {
+      ...formData,
+      duration: parseInt(formData.duration),
+      thumbnailUrl: `https://img.youtube.com/vi/${extractYouTubeId(formData.youtubeUrl)}/maxresdefault.jpg`,
+    };
+
+    if (editingVideo) {
+      updateVideo(editingVideo.id, videoData);
+    } else {
+      addVideo(videoData);
+    }
+    
+    resetForm();
+  };
+
+  const handleEdit = (video: Video) => {
+    setFormData({
+      title: video.title,
+      youtubeUrl: video.youtubeUrl,
+      category: video.category,
+      difficulty: video.difficulty,
+      machineType: video.machineType,
+      duration: video.duration.toString(),
+      description: video.description,
+    });
+    setEditingVideo(video);
+    setShowAddForm(true);
+  };
 
   const extractYouTubeId = (url: string) => {
     if (!url) return null;
     
-    // Handle various YouTube URL formats
     const patterns = [
       /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
       /youtube\.com\/watch\?.*v=([^&\n?#]+)/,
-      /^([a-zA-Z0-9_-]{11})$/ // Direct video ID
+      /^([a-zA-Z0-9_-]{11})$/
     ];
     
     for (const pattern of patterns) {
@@ -44,7 +94,6 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
       }
     }
     
-    // If it's already an embed URL, extract the ID
     if (url.includes('youtube.com/embed/')) {
       const embedMatch = url.match(/youtube\.com\/embed\/([^?&]+)/);
       if (embedMatch) return embedMatch[1];
@@ -59,40 +108,8 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
     return `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1`;
   };
 
-  const getThumbnailUrl = (url: string) => {
-    const videoId = extractYouTubeId(url);
-    if (!videoId) return null;
-    return `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
-  };
-
-  const handleAddVideo = () => {
-    if (newVideo.title && newVideo.youtubeUrl && newVideo.category && newVideo.duration) {
-      addVideo({
-        title: newVideo.title,
-        youtubeUrl: newVideo.youtubeUrl,
-        category: newVideo.category,
-        difficulty: newVideo.difficulty,
-        duration: parseInt(newVideo.duration),
-        description: newVideo.description,
-        thumbnailUrl: "", // Not needed since we're using direct YouTube URLs
-        tags: newVideo.tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0)
-      });
-      
-      setNewVideo({
-        title: "",
-        youtubeUrl: "",
-        category: "",
-        difficulty: "beginner",
-        duration: "",
-        description: "",
-        tags: ""
-      });
-      setIsAddingVideo(false);
-    }
-  };
-
   const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
+    switch (difficulty?.toLowerCase()) {
       case 'beginner': return 'bg-green-100 text-green-800';
       case 'intermediate': return 'bg-yellow-100 text-yellow-800';
       case 'advanced': return 'bg-red-100 text-red-800';
@@ -101,75 +118,150 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-gray-100 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <header className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={onBack}
-                className="hover:bg-gray-100"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
-              </Button>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
-                <p className="text-sm text-gray-600">Manage your video library</p>
-              </div>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+              <p className="text-gray-600 mt-1">Manage your video library and workout content</p>
             </div>
-            <Dialog open={isAddingVideo} onOpenChange={setIsAddingVideo}>
-              <DialogTrigger asChild>
-                <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Video
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-md">
-                <DialogHeader>
-                  <DialogTitle>Add New Video</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4">
+            <Button 
+              onClick={() => setShowAddForm(!showAddForm)}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add Video
+            </Button>
+          </div>
+        </div>
+      </header>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="p-2 bg-blue-100 rounded-lg">
+                  <Play className="w-6 h-6 text-blue-600" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Total Videos</p>
+                  <p className="text-2xl font-bold text-gray-900">{allVideos.length}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="p-2 bg-green-100 rounded-lg">
+                  <Users className="w-6 h-6 text-green-600" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Categories</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {new Set(allVideos.map(v => v.category)).size}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="p-2 bg-purple-100 rounded-lg">
+                  <Clock className="w-6 h-6 text-purple-600" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Total Duration</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {allVideos.reduce((sum, video) => sum + video.duration, 0)}m
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="p-2 bg-orange-100 rounded-lg">
+                  <TrendingUp className="w-6 h-6 text-orange-600" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Avg Rating</p>
+                  <p className="text-2xl font-bold text-gray-900">4.8</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Add/Edit Video Form */}
+        {showAddForm && (
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle>{editingVideo ? 'Edit Video' : 'Add New Video'}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="title">Title</Label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Title *
+                    </label>
                     <Input
-                      id="title"
-                      value={newVideo.title}
-                      onChange={(e) => setNewVideo({...newVideo, title: e.target.value})}
+                      value={formData.title}
+                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                       placeholder="Enter video title"
+                      required
                     />
                   </div>
+                  
                   <div>
-                    <Label htmlFor="youtubeUrl">YouTube URL</Label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      YouTube URL *
+                    </label>
                     <Input
-                      id="youtubeUrl"
-                      value={newVideo.youtubeUrl}
-                      onChange={(e) => setNewVideo({...newVideo, youtubeUrl: e.target.value})}
-                      placeholder="https://youtube.com/watch?v=... or embedded URL"
+                      value={formData.youtubeUrl}
+                      onChange={(e) => setFormData({ ...formData, youtubeUrl: e.target.value })}
+                      placeholder="https://youtube.com/watch?v=..."
+                      required
                     />
                   </div>
+                  
                   <div>
-                    <Label htmlFor="category">Category</Label>
-                    <Input
-                      id="category"
-                      value={newVideo.category}
-                      onChange={(e) => setNewVideo({...newVideo, category: e.target.value})}
-                      placeholder="e.g., Cardio, Strength, Yoga"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="difficulty">Difficulty Level</Label>
-                    <Select 
-                      value={newVideo.difficulty} 
-                      onValueChange={(value: "beginner" | "intermediate" | "advanced") => 
-                        setNewVideo({...newVideo, difficulty: value})
-                      }
-                    >
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Category *
+                    </label>
+                    <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
                       <SelectTrigger>
-                        <SelectValue />
+                        <SelectValue placeholder="Select category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Strength">Strength</SelectItem>
+                        <SelectItem value="Cardio">Cardio</SelectItem>
+                        <SelectItem value="HIIT">HIIT</SelectItem>
+                        <SelectItem value="Yoga">Yoga</SelectItem>
+                        <SelectItem value="Pilates">Pilates</SelectItem>
+                        <SelectItem value="Flexibility">Flexibility</SelectItem>
+                        <SelectItem value="Dance">Dance</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Difficulty Level *
+                    </label>
+                    <Select value={formData.difficulty} onValueChange={(value) => setFormData({ ...formData, difficulty: value })}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select difficulty" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="beginner">Beginner</SelectItem>
@@ -178,125 +270,84 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
                       </SelectContent>
                     </Select>
                   </div>
+
                   <div>
-                    <Label htmlFor="duration">Duration (minutes)</Label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Machine Type *
+                    </label>
+                    <Select value={formData.machineType} onValueChange={(value) => setFormData({ ...formData, machineType: value })}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select machine type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="bodyweight">Bodyweight</SelectItem>
+                        <SelectItem value="dumbbells">Dumbbells</SelectItem>
+                        <SelectItem value="barbell">Barbell</SelectItem>
+                        <SelectItem value="treadmill">Treadmill</SelectItem>
+                        <SelectItem value="cable">Cable Machine</SelectItem>
+                        <SelectItem value="resistance-bands">Resistance Bands</SelectItem>
+                        <SelectItem value="kettlebells">Kettlebells</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Duration (minutes) *
+                    </label>
                     <Input
-                      id="duration"
                       type="number"
-                      value={newVideo.duration}
-                      onChange={(e) => setNewVideo({...newVideo, duration: e.target.value})}
-                      placeholder="15"
+                      value={formData.duration}
+                      onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
+                      placeholder="30"
+                      min="1"
+                      required
                     />
                   </div>
-                  <div>
-                    <Label htmlFor="description">Description (optional)</Label>
-                    <Input
-                      id="description"
-                      value={newVideo.description}
-                      onChange={(e) => setNewVideo({...newVideo, description: e.target.value})}
-                      placeholder="Brief description of the video"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="tags">Tags (comma separated)</Label>
-                    <Input
-                      id="tags"
-                      value={newVideo.tags}
-                      onChange={(e) => setNewVideo({...newVideo, tags: e.target.value})}
-                      placeholder="e.g., strength, muscle, workout"
-                    />
-                  </div>
-                  <Button 
-                    onClick={handleAddVideo}
-                    className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
-                  >
-                    Add Video
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Description
+                  </label>
+                  <Input
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    placeholder="Brief description of the workout"
+                  />
+                </div>
+                
+                <div className="flex space-x-4">
+                  <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+                    {editingVideo ? 'Update Video' : 'Add Video'}
+                  </Button>
+                  <Button type="button" variant="outline" onClick={resetForm}>
+                    Cancel
                   </Button>
                 </div>
-              </DialogContent>
-            </Dialog>
-          </div>
-        </div>
-      </header>
-
-      {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-2">
-                <Youtube className="w-5 h-5 text-red-500" />
-                <div>
-                  <p className="text-2xl font-bold text-gray-900">{videos.length}</p>
-                  <p className="text-sm text-gray-600">Total Videos</p>
-                </div>
-              </div>
+              </form>
             </CardContent>
           </Card>
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-2">
-                <Tag className="w-5 h-5 text-blue-500" />
-                <div>
-                  <p className="text-2xl font-bold text-gray-900">{new Set(videos.map(v => v.category)).size}</p>
-                  <p className="text-sm text-gray-600">Categories</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-2">
-                <Clock className="w-5 h-5 text-green-500" />
-                <div>
-                  <p className="text-2xl font-bold text-gray-900">{videos.reduce((acc, v) => acc + v.duration, 0)}</p>
-                  <p className="text-sm text-gray-600">Total Minutes</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-2">
-                <Star className="w-5 h-5 text-yellow-500" />
-                <div>
-                  <p className="text-2xl font-bold text-gray-900">{videos.filter(v => v.difficulty === 'advanced').length}</p>
-                  <p className="text-sm text-gray-600">Advanced</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        )}
 
         {/* Video Library */}
         <Card>
           <CardHeader>
-            <CardTitle>Video Library</CardTitle>
+            <CardTitle className="flex items-center space-x-2">
+              <Play className="w-5 h-5" />
+              <span>Video Library ({allVideos.length})</span>
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            {videos.length === 0 ? (
-              <div className="text-center py-12">
-                <Youtube className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">No videos yet</h3>
-                <p className="text-gray-600 mb-4">Add your first video to get started</p>
-                <Button 
-                  onClick={() => setIsAddingVideo(true)}
-                  className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Your First Video
-                </Button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {videos.map((video) => {
-                  const embedUrl = getEmbedUrl(video.youtubeUrl);
-                  const thumbnailUrl = getThumbnailUrl(video.youtubeUrl);
-                  
-                  return (
-                    <div key={video.id} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
-                      <div className="aspect-video bg-gray-100 relative">
+            <div className="space-y-4">
+              {allVideos.map((video) => {
+                const embedUrl = getEmbedUrl(video.youtubeUrl);
+                const isExpanded = expandedVideo === video.id;
+                
+                return (
+                  <div key={video.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-32 h-20 bg-gray-200 rounded overflow-hidden flex-shrink-0">
                         {embedUrl ? (
                           <iframe
                             src={embedUrl}
@@ -306,57 +357,88 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                             allowFullScreen
                           />
-                        ) : thumbnailUrl ? (
-                          <img 
-                            src={thumbnailUrl} 
-                            alt={video.title}
-                            className="w-full h-full object-cover"
-                          />
                         ) : (
-                          <div className="w-full h-full flex flex-col items-center justify-center text-gray-500">
-                            <Youtube className="w-8 h-8 mb-2" />
-                            <p className="text-sm">Invalid YouTube URL</p>
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Play className="w-8 h-8 text-gray-400" />
                           </div>
                         )}
-                        <div className="absolute bottom-2 right-2 bg-black/75 text-white px-2 py-1 rounded text-xs">
-                          {video.duration}min
-                        </div>
                       </div>
-                      <div className="p-4">
-                        <h4 className="font-semibold text-gray-900 mb-2 line-clamp-2">{video.title}</h4>
-                        <div className="flex items-center justify-between mb-3">
+                      
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-gray-900 truncate">{video.title}</h3>
+                        <p className="text-sm text-gray-600 mt-1 line-clamp-2">{video.description}</p>
+                        <div className="flex items-center space-x-4 text-sm text-gray-600 mt-2">
+                          <span className="flex items-center space-x-1">
+                            <Clock className="w-3 h-3" />
+                            <span>{video.duration}min</span>
+                          </span>
                           <Badge variant="secondary">{video.category}</Badge>
                           <Badge className={getDifficultyColor(video.difficulty)}>
                             {video.difficulty}
                           </Badge>
-                        </div>
-                        {video.description && (
-                          <p className="text-sm text-gray-600 mb-3 line-clamp-2">{video.description}</p>
-                        )}
-                        <div className="flex items-center justify-between">
-                          <a 
-                            href={video.youtubeUrl} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="text-red-500 hover:text-red-600 text-sm font-medium"
-                          >
-                            View on YouTube
-                          </a>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => deleteVideo(video.id)}
-                            className="text-red-500 hover:text-red-600 hover:bg-red-50"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
+                          <Badge variant="outline">{video.machineType}</Badge>
                         </div>
                       </div>
+                      
+                      <div className="flex items-center space-x-2">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => setExpandedVideo(isExpanded ? null : video.id)}
+                        >
+                          {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleEdit(video)}
+                          className="text-blue-600 hover:text-blue-700"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => deleteVideo(video.id)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
-                  );
-                })}
-              </div>
-            )}
+                    
+                    {isExpanded && (
+                      <div className="mt-4 pt-4 border-t">
+                        <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
+                          {embedUrl ? (
+                            <iframe
+                              src={embedUrl}
+                              title={video.title}
+                              className="w-full h-full"
+                              frameBorder="0"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                              allowFullScreen
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-gray-500">
+                              <p>Video unavailable</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+              
+              {allVideos.length === 0 && (
+                <div className="text-center py-12">
+                  <Play className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">No videos yet</h3>
+                  <p className="text-gray-600">Add your first workout video to get started.</p>
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
       </div>
