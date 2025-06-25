@@ -1,9 +1,10 @@
 import { useState, useMemo } from "react";
-import { ArrowLeft, Search, Play, Clock, Star, Tag, Download, Volume2, Mic, VolumeX } from "lucide-react";
+import { ArrowLeft, Search, Play, Clock, Star, Tag, Download, Volume2, Mic, VolumeX, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useVideoStore } from "../store/videoStore";
 
 interface SearchInterfaceProps {
@@ -17,6 +18,67 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
   const [generatedPlan, setGeneratedPlan] = useState<any>(null);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [currentAudio, setCurrentAudio] = useState<SpeechSynthesisUtterance | null>(null);
+  
+  // Class Parameters filters
+  const [selectedDuration, setSelectedDuration] = useState("");
+  const [selectedMachine, setSelectedMachine] = useState("");
+  const [selectedDifficulty, setSelectedDifficulty] = useState("");
+  const [filteredVideos, setFilteredVideos] = useState<any[]>([]);
+  const [isFiltering, setIsFiltering] = useState(false);
+
+  // Sample video data with extended properties
+  const sampleVideos = [
+    {
+      id: 1,
+      title: "Beginner Dumbbell Workout",
+      description: "Perfect introduction to dumbbell exercises for beginners",
+      youtubeUrl: "https://www.youtube.com/watch?v=M0uO8X3_tEA",
+      duration: 15,
+      category: "strength",
+      difficulty: "beginner",
+      machineType: "dumbbells"
+    },
+    {
+      id: 2,
+      title: "Advanced Barbell Training",
+      description: "Intensive barbell training for experienced lifters",
+      youtubeUrl: "https://www.youtube.com/watch?v=4BOTvaRaDjI",
+      duration: 30,
+      category: "strength",
+      difficulty: "advanced",
+      machineType: "barbell"
+    },
+    {
+      id: 3,
+      title: "Treadmill HIIT Cardio",
+      description: "High-intensity interval training on treadmill",
+      youtubeUrl: "https://www.youtube.com/watch?v=ml6cT4AZdqI",
+      duration: 20,
+      category: "cardio",
+      difficulty: "intermediate",
+      machineType: "treadmill"
+    },
+    {
+      id: 4,
+      title: "Cable Machine Full Body",
+      description: "Complete body workout using cable machines",
+      youtubeUrl: "https://www.youtube.com/watch?v=gC_L9qAHVJ8",
+      duration: 45,
+      category: "strength",
+      difficulty: "intermediate",
+      machineType: "cable"
+    },
+    {
+      id: 5,
+      title: "Bodyweight Beginner Routine",
+      description: "No equipment needed - perfect for home workouts",
+      youtubeUrl: "https://www.youtube.com/watch?v=IODxDxX7oi4",
+      duration: 25,
+      category: "bodyweight",
+      difficulty: "beginner",
+      machineType: "bodyweight"
+    }
+  ];
 
   const extractYouTubeId = (url: string) => {
     if (!url) return null;
@@ -94,6 +156,36 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
     setIsGenerating(false);
     
     console.log("Generated Workout Plan:", workoutPlan);
+  };
+
+  const filterVideos = async () => {
+    setIsFiltering(true);
+    
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    let filtered = sampleVideos;
+    
+    if (selectedDuration) {
+      const duration = parseInt(selectedDuration);
+      filtered = filtered.filter(video => {
+        if (duration === 15) return video.duration <= 15;
+        if (duration === 30) return video.duration > 15 && video.duration <= 30;
+        if (duration === 45) return video.duration > 30 && video.duration <= 45;
+        return video.duration > 45;
+      });
+    }
+    
+    if (selectedMachine) {
+      filtered = filtered.filter(video => video.machineType === selectedMachine);
+    }
+    
+    if (selectedDifficulty) {
+      filtered = filtered.filter(video => video.difficulty === selectedDifficulty);
+    }
+    
+    setFilteredVideos(filtered);
+    setIsFiltering(false);
   };
 
   const getDifficultyColor = (difficulty: string) => {
@@ -342,8 +434,152 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
       </header>
 
       {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Smart Search */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        {/* Class Parameters Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Left: Class Parameters */}
+          <Card className="bg-gradient-to-r from-gray-50 to-blue-50 border-blue-200">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2 text-blue-700">
+                <Filter className="w-5 h-5" />
+                <span>Class Parameters</span>
+              </CardTitle>
+              <p className="text-blue-600 text-sm mt-2">
+                Filter videos by specific criteria to find the perfect workout
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-2 block">Class Duration</label>
+                  <Select value={selectedDuration} onValueChange={setSelectedDuration}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select duration" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="15">15 minutes or less</SelectItem>
+                      <SelectItem value="30">16-30 minutes</SelectItem>
+                      <SelectItem value="45">31-45 minutes</SelectItem>
+                      <SelectItem value="60">45+ minutes</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-2 block">Machine Type</label>
+                  <Select value={selectedMachine} onValueChange={setSelectedMachine}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select machine type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="dumbbells">Dumbbells</SelectItem>
+                      <SelectItem value="barbell">Barbell</SelectItem>
+                      <SelectItem value="treadmill">Treadmill</SelectItem>
+                      <SelectItem value="cable">Cable Machine</SelectItem>
+                      <SelectItem value="bodyweight">Bodyweight</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-2 block">Difficulty Level</label>
+                  <Select value={selectedDifficulty} onValueChange={setSelectedDifficulty}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select difficulty" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="beginner">Beginner</SelectItem>
+                      <SelectItem value="intermediate">Intermediate</SelectItem>
+                      <SelectItem value="advanced">Advanced</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <Button 
+                  onClick={filterVideos}
+                  disabled={isFiltering || (!selectedDuration && !selectedMachine && !selectedDifficulty)}
+                  className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+                >
+                  {isFiltering ? (
+                    <>
+                      <div className="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Filtering...
+                    </>
+                  ) : (
+                    <>
+                      <Play className="w-4 h-4 mr-2" />
+                      GENERATE CLASS
+                    </>
+                  )}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Right: Generated Class Preview */}
+          <Card className="bg-gradient-to-r from-cyan-50 to-blue-50 border-cyan-200">
+            <CardHeader>
+              <CardTitle className="text-cyan-700">Generated Class Preview</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {filteredVideos.length > 0 ? (
+                <div className="space-y-4">
+                  <div className="text-sm text-cyan-600 mb-4">
+                    Found {filteredVideos.length} matching videos for your criteria
+                  </div>
+                  <div className="space-y-3 max-h-96 overflow-y-auto">
+                    {filteredVideos.map((video) => {
+                      const embedUrl = getEmbedUrl(video.youtubeUrl);
+                      return (
+                        <div key={video.id} className="border rounded-lg p-3 bg-white">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-16 h-10 bg-gray-200 rounded overflow-hidden flex-shrink-0">
+                              {embedUrl ? (
+                                <iframe
+                                  src={embedUrl}
+                                  title={video.title}
+                                  className="w-full h-full"
+                                  frameBorder="0"
+                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                  allowFullScreen
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center">
+                                  <Play className="w-4 h-4 text-gray-400" />
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-medium text-sm text-gray-900 truncate">{video.title}</h4>
+                              <div className="flex items-center space-x-2 text-xs text-gray-600 mt-1">
+                                <span>{video.duration}min</span>
+                                <Badge variant="secondary" className="text-xs">{video.machineType}</Badge>
+                                <Badge className={`text-xs ${getDifficultyColor(video.difficulty)}`}>
+                                  {video.difficulty}
+                                </Badge>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 bg-cyan-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Play className="w-8 h-8 text-cyan-600" />
+                  </div>
+                  <p className="text-cyan-600 text-sm">
+                    Generate a class to see the preview here. The system will select appropriate videos from the library and add AI-generated transitions.
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Smart Search Section */}
         <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2 text-blue-700">
@@ -409,22 +645,26 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
         </Card>
 
         {/* Instructions */}
-        <Card className="mt-8 bg-gradient-to-r from-green-50 to-emerald-50 border-green-200">
+        <Card className="bg-gradient-to-r from-green-50 to-emerald-50 border-green-200">
           <CardContent className="pt-6">
             <div className="text-center">
               <h3 className="text-lg font-semibold text-green-800 mb-2">How it works</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-green-700">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm text-green-700">
+                <div className="flex items-center space-x-2">
+                  <Filter className="w-4 h-4" />
+                  <span>Filter by parameters</span>
+                </div>
                 <div className="flex items-center space-x-2">
                   <Search className="w-4 h-4" />
-                  <span>Describe your fitness goal</span>
+                  <span>Or describe your goal</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Play className="w-4 h-4" />
-                  <span>Get personalized video playlist</span>
+                  <span>Get personalized playlist</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Volume2 className="w-4 h-4" />
-                  <span>Follow AI voice guidance</span>
+                  <span>Follow AI guidance</span>
                 </div>
               </div>
             </div>
