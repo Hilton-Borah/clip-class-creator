@@ -26,6 +26,9 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
     duration: "",
     description: "",
     tags: "",
+    intensity: "",
+    bodyParts: "",
+    goals: "",
   });
 
   // Combine user-added videos with the video library for display
@@ -41,6 +44,9 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
       duration: "",
       description: "",
       tags: "",
+      intensity: "",
+      bodyParts: "",
+      goals: "",
     });
     setShowAddForm(false);
     setEditingVideo(null);
@@ -55,10 +61,18 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
     }
 
     const videoData = {
-      ...formData,
+      title: formData.title,
+      youtubeUrl: formData.youtubeUrl,
+      category: formData.category,
+      difficulty: formData.difficulty,
+      machineType: formData.machineType,
       duration: parseInt(formData.duration),
+      description: formData.description,
       thumbnailUrl: `https://img.youtube.com/vi/${extractYouTubeId(formData.youtubeUrl)}/maxresdefault.jpg`,
       tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0),
+      intensity: formData.intensity || 'moderate',
+      bodyParts: formData.bodyParts.split(',').map(part => part.trim()).filter(part => part.length > 0),
+      goals: formData.goals.split(',').map(goal => goal.trim()).filter(goal => goal.length > 0),
     };
 
     if (editingVideo) {
@@ -80,6 +94,9 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
       duration: video.duration.toString(),
       description: video.description,
       tags: video.tags.join(', '),
+      intensity: video.intensity || 'moderate',
+      bodyParts: video.bodyParts.join(', '),
+      goals: video.goals.join(', '),
     });
     setEditingVideo(video);
     setShowAddForm(true);
@@ -324,6 +341,34 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
                       required
                     />
                   </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Intensity
+                    </label>
+                    <Select value={formData.intensity} onValueChange={(value) => setFormData({ ...formData, intensity: value })}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select intensity" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="low">Low</SelectItem>
+                        <SelectItem value="moderate">Moderate</SelectItem>
+                        <SelectItem value="high">High</SelectItem>
+                        <SelectItem value="very high">Very High</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Body Parts (comma-separated)
+                    </label>
+                    <Input
+                      value={formData.bodyParts}
+                      onChange={(e) => setFormData({ ...formData, bodyParts: e.target.value })}
+                      placeholder="full body, core, legs, arms"
+                    />
+                  </div>
                 </div>
                 
                 <div>
@@ -345,6 +390,17 @@ const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
                     value={formData.tags}
                     onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
                     placeholder="hiit, cardio, strength, etc."
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Goals (comma-separated)
+                  </label>
+                  <Input
+                    value={formData.goals}
+                    onChange={(e) => setFormData({ ...formData, goals: e.target.value })}
+                    placeholder="fat loss, muscle building, flexibility"
                   />
                 </div>
                 
