@@ -26,6 +26,7 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
   const [filteredVideos, setFilteredVideos] = useState<any[]>([]);
   const [isFiltering, setIsFiltering] = useState(false);
   const [hasFiltered, setHasFiltered] = useState(false);
+  const [searchType, setSearchType] = useState<'smart' | 'filter'>('smart');
 
   // Use combined video data (library + user added videos)
   const allVideos = useMemo(() => [...videoLibrary, ...videos], [videoLibrary, videos]);
@@ -97,6 +98,7 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
     if (!smartQuery.trim()) return;
     
     setIsGenerating(true);
+    setSearchType('smart');
     
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 2000));
@@ -110,6 +112,7 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
 
   const filterVideos = async () => {
     setIsFiltering(true);
+    setSearchType('filter');
     
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -135,6 +138,13 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
     }
     
     setFilteredVideos(filtered);
+    setGeneratedPlan({
+      matchedVideos: filtered,
+      difficulty: selectedDifficulty || 'mixed',
+      goal: 'filtered workout',
+      category: 'custom',
+      audioNotes: filtered.map(() => "Get ready for this exercise. Focus on proper form and breathing."),
+    });
     setHasFiltered(true);
     setIsFiltering(false);
     
@@ -161,10 +171,12 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
   const resetGeneration = () => {
     setGeneratedPlan(null);
     setSmartQuery("");
+    setFilteredVideos([]);
+    setHasFiltered(false);
     stopSpeaking();
   };
 
-  // If smart workout plan is generated, show the result
+  // If workout plan is generated (either smart or filtered), show the result
   if (generatedPlan) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
@@ -182,8 +194,15 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
                   New Search
                 </Button>
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900">Smart Workout Plan</h1>
-                  <p className="text-sm text-gray-600">AI-generated training plan with voiceovers</p>
+                  <h1 className="text-2xl font-bold text-gray-900">
+                    {searchType === 'smart' ? 'Smart Workout Plan' : 'Filtered Workout Plan'}
+                  </h1>
+                  <p className="text-sm text-gray-600">
+                    {searchType === 'smart' 
+                      ? 'AI-generated training plan with voiceovers' 
+                      : 'Custom filtered training plan'
+                    }
+                  </p>
                 </div>
               </div>
               <div className="flex items-center space-x-2">
@@ -214,7 +233,10 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="text-green-700 text-2xl">
-                    {generatedPlan.difficulty.charAt(0).toUpperCase() + generatedPlan.difficulty.slice(1)} {generatedPlan.goal.charAt(0).toUpperCase() + generatedPlan.goal.slice(1)} Plan
+                    {searchType === 'smart' 
+                      ? `${generatedPlan.difficulty.charAt(0).toUpperCase() + generatedPlan.difficulty.slice(1)} ${generatedPlan.goal.charAt(0).toUpperCase() + generatedPlan.goal.slice(1)} Plan`
+                      : `${generatedPlan.difficulty.charAt(0).toUpperCase() + generatedPlan.difficulty.slice(1)} Filtered Workout`
+                    }
                   </CardTitle>
                   <p className="text-green-600 mt-2">
                     {generatedPlan.matchedVideos.length} videos • {generatedPlan.matchedVideos.reduce((sum: number, v: any) => sum + v.duration, 0)} minutes total
@@ -230,11 +252,11 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                 <div className="flex items-center space-x-2">
                   <Volume2 className="w-4 h-4 text-green-600" />
-                  <span>AI voiceovers included</span>
+                  <span>{searchType === 'smart' ? 'AI voiceovers included' : 'Voice guidance available'}</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Star className="w-4 h-4 text-green-600" />
-                  <span>Perfectly matched difficulty</span>
+                  <span>{searchType === 'smart' ? 'Perfectly matched difficulty' : 'Custom filtered results'}</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Tag className="w-4 h-4 text-green-600" />
@@ -257,7 +279,7 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
                   return (
                     <div key={video.id} className="border rounded-lg p-4 bg-gray-50">
                       {/* Audio Note Before */}
-                      {generatedPlan.audioNotes[index] && (
+                      {generatedPlan.audioNotes[index] && searchType === 'smart' && (
                         <div className="mb-4 p-3 bg-blue-100 rounded-lg border-l-4 border-blue-500">
                           <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center space-x-2">
@@ -311,6 +333,11 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
                               <Badge className={getDifficultyColor(video.difficulty)}>
                                 {video.difficulty}
                               </Badge>
+                              {video.intensity && (
+                                <Badge variant="outline">
+                                  {video.intensity}
+                                </Badge>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -337,7 +364,7 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
                       </div>
 
                       {/* Final Audio Note */}
-                      {index === generatedPlan.matchedVideos.length - 1 && generatedPlan.audioNotes[index + 1] && (
+                      {index === generatedPlan.matchedVideos.length - 1 && generatedPlan.audioNotes[index + 1] && searchType === 'smart' && (
                         <div className="mt-4 p-3 bg-green-100 rounded-lg border-l-4 border-green-500">
                           <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center space-x-2">
@@ -490,143 +517,71 @@ const SearchInterface = ({ onBack }: SearchInterfaceProps) => {
             </CardContent>
           </Card>
 
-          {/* Right: Generated Class Preview */}
-          <Card className="bg-gradient-to-r from-cyan-50 to-blue-50 border-cyan-200">
+          {/* Right: Smart Search Section */}
+          <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
             <CardHeader>
-              <CardTitle className="text-cyan-700">Generated Class Preview</CardTitle>
+              <CardTitle className="flex items-center space-x-2 text-blue-700">
+                <Mic className="w-5 h-5" />
+                <span>Smart Workout Generator</span>
+              </CardTitle>
+              <p className="text-blue-600 text-sm mt-2">
+                Describe your workout goals and get a personalized training plan with embedded videos and voice guidance
+              </p>
             </CardHeader>
             <CardContent>
-              {hasFiltered && filteredVideos.length > 0 ? (
-                <div className="space-y-4">
-                  <div className="text-sm text-cyan-600 mb-4">
-                    Found {filteredVideos.length} matching videos for your criteria
-                  </div>
-                  <div className="space-y-3 max-h-96 overflow-y-auto">
-                    {filteredVideos.map((video) => {
-                      const embedUrl = getEmbedUrl(video.youtubeUrl);
-                      return (
-                        <div key={video.id} className="border rounded-lg p-3 bg-white">
-                          <div className="flex items-center space-x-3">
-                            <div className="w-16 h-10 bg-gray-200 rounded overflow-hidden flex-shrink-0">
-                              {embedUrl ? (
-                                <iframe
-                                  src={embedUrl}
-                                  title={video.title}
-                                  className="w-full h-full"
-                                  frameBorder="0"
-                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                  allowFullScreen
-                                />
-                              ) : (
-                                <div className="w-full h-full flex items-center justify-center">
-                                  <Play className="w-4 h-4 text-gray-400" />
-                                </div>
-                              )}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <h4 className="font-medium text-sm text-gray-900 truncate">{video.title}</h4>
-                              <p className="text-xs text-gray-600 mt-1 line-clamp-2">{video.description}</p>
-                              <div className="flex items-center space-x-2 text-xs text-gray-600 mt-1">
-                                <span>{video.duration}min</span>
-                                <Badge variant="secondary" className="text-xs">{video.machineType}</Badge>
-                                <Badge className={`text-xs ${getDifficultyColor(video.difficulty)}`}>
-                                  {video.difficulty}
-                                </Badge>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
+              <div className="space-y-4">
+                <div className="flex space-x-2">
+                  <Input
+                    placeholder="Describe your workout: 'I want advanced muscle building training' or 'beginner cardio for fat loss'"
+                    value={smartQuery}
+                    onChange={(e) => setSmartQuery(e.target.value)}
+                    className="flex-1 text-base"
+                  />
+                  <Button 
+                    onClick={generateSmartWorkout}
+                    disabled={isGenerating || !smartQuery.trim()}
+                    className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 px-8"
+                  >
+                    {isGenerating ? (
+                      <>
+                        <div className="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <Search className="w-4 h-4 mr-2" />
+                        Generate Plan
+                      </>
+                    )}
+                  </Button>
+                </div>
+                <div className="space-y-3">
+                  <span className="text-gray-600 text-sm font-medium">Try these examples:</span>
+                  <div className="grid grid-cols-1 gap-2">
+                    {[
+                      "I want deadlift beginner training",
+                      "Advanced muscle building workout",
+                      "Cutting workout for weight loss", 
+                      "Cardio and flexibility for beginners",
+                      "HIIT workout for fat burning",
+                      "Intermediate weight lifting program"
+                    ].map((example) => (
+                      <Button
+                        key={example}
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setSmartQuery(example)}
+                        className="text-sm text-left justify-start h-auto py-2 px-3 hover:bg-blue-50 hover:border-blue-300"
+                      >
+                        {example}
+                      </Button>
+                    ))}
                   </div>
                 </div>
-              ) : hasFiltered && filteredVideos.length === 0 ? (
-                <div className="text-center py-8">
-                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Search className="w-8 h-8 text-gray-400" />
-                  </div>
-                  <p className="text-gray-600 text-sm">
-                    No videos found matching your criteria. Try adjusting your filters.
-                  </p>
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <div className="w-16 h-16 bg-cyan-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Play className="w-8 h-8 text-cyan-600" />
-                  </div>
-                  <p className="text-cyan-600 text-sm">
-                    Generate a class to see the preview here. The system will select appropriate videos from the library and add AI-generated transitions.
-                  </p>
-                </div>
-              )}
+              </div>
             </CardContent>
           </Card>
         </div>
-
-        {/* Smart Search Section */}
-        <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2 text-blue-700">
-              <Mic className="w-5 h-5" />
-              <span>Smart Workout Generator</span>
-            </CardTitle>
-            <p className="text-blue-600 text-sm mt-2">
-              Describe your workout goals and get a personalized training plan with embedded videos and voice guidance
-            </p>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex space-x-2">
-                <Input
-                  placeholder="Describe your workout: 'I want advanced muscle building training' or 'beginner cardio for fat loss'"
-                  value={smartQuery}
-                  onChange={(e) => setSmartQuery(e.target.value)}
-                  className="flex-1 text-base"
-                />
-                <Button 
-                  onClick={generateSmartWorkout}
-                  disabled={isGenerating || !smartQuery.trim()}
-                  className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 px-8"
-                >
-                  {isGenerating ? (
-                    <>
-                      <div className="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Generating...
-                    </>
-                  ) : (
-                    <>
-                      <Search className="w-4 h-4 mr-2" />
-                      Generate Plan
-                    </>
-                  )}
-                </Button>
-              </div>
-              <div className="space-y-3">
-                <span className="text-gray-600 text-sm font-medium">Try these examples:</span>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  {[
-                    "I want deadlift beginner training",
-                    "Advanced muscle building workout",
-                    "Cutting workout for weight loss", 
-                    "Cardio and flexibility for beginners",
-                    "HIIT workout for fat burning",
-                    "Intermediate weight lifting program"
-                  ].map((example) => (
-                    <Button
-                      key={example}
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setSmartQuery(example)}
-                      className="text-sm text-left justify-start h-auto py-2 px-3 hover:bg-blue-50 hover:border-blue-300"
-                    >
-                      {example}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
 
         {/* Instructions */}
         <Card className="bg-gradient-to-r from-green-50 to-emerald-50 border-green-200">
